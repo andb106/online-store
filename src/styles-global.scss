@@ -1,0 +1,93 @@
+body {
+  color: #fff;
+  background: #17181c;
+  font-family: sans-serif;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  padding: 10px 30px;
+  border-bottom: 1px solid white;
+  margin-bottom: 10px;
+}
+
+header h1 {
+  font-size: 30px;
+  font-weight: 800;
+  margin: 0;
+}
+
+footer {
+  border-top: 1px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+footer .copyright {
+  font-size: 14px;
+  color: #333;
+  text-align: center;
+}
+footer .copyright a {
+  color: #444;
+}
+footer .copyright a:hover {
+  color: #555;
+}
+footer .copyright:before {
+  content: '©';
+}
+
+.footer__school-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding: 0 50px;
+}
+
+.ico-github {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  background-image: url("./img/github.svg");
+  background-size: contain;
+}
+
+.ico-github:hover {
+  transform: scale(1.1);
+  transition: 0.3s;
+}
+
+.ico-rsscool {
+  display: inline-block;
+  width: 60px;
+  height: 30px;
+  background-image: url("./img/rs_school_js.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.ico-rsscool:hover {
+  transform: scale(1.1);
+  transition: 0.3s;
+}
+
+main {
+  display: flex;
+  flex: 1;
+  gap: 50px;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  @media (max-width: 1050px) {
+    gap: unset;
+  }
+}

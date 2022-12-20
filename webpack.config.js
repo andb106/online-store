@@ -15,6 +15,7 @@ const config = {
     path: path.resolve(__dirname, 'dist'),
     clean: true,
     filename: '[name].[contenthash].js',
+    publicPath: '/',
   },
   devtool: isProduction ? undefined : 'source-map',
   devServer: {
@@ -22,6 +23,9 @@ const config = {
     host: 'localhost',
     hot: false,
     static: path.resolve(__dirname, 'dist'),
+    historyApiFallback: {
+      rewrites: [{ from: /./, to: '/index.html' }],
+    },
   },
   plugins: [
     new HtmlWebpackPlugin({

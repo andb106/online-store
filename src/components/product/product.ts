@@ -4,7 +4,7 @@ import './product.scss';
 
 export class Product extends BaseComponent {
   id: number;
-  constructor(data: IProduct) {
+  constructor(data: IProduct, cbClick?: () => void) {
     super('div', 'product');
     this.id = data.id;
     this.element.innerHTML = `
@@ -14,5 +14,6 @@ export class Product extends BaseComponent {
       <p class="card-text">$${data.description}</p>
     </div>
     `;
+    if (cbClick) this.element.onclick = cbClick.bind(this.element, this.id);
   }
 }

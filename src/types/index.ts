@@ -14,5 +14,5 @@ export interface IProduct {
 
 export interface IRoute {
   path: string;
-  view: () => void;
+  view: (params: { [k: string]: string }) => void;
 }

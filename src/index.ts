@@ -1,32 +1,59 @@
 import { Product } from './components/product/product';
 import './styles-global.scss';
-import { IProduct } from './types';
+// import { IProduct } from './types';
 import Router from './utils/router';
+import { ProductList } from './components/productList/productList';
+import dataJson from './data/data.json';
+import { dataCategory, dataBrand } from './data/dataFilters';
+import { Filters } from './components/filters/filters';
+import { Observer } from './utils/observer';
+import { IProduct, IState } from './types';
 
-const response = await fetch('https://dummyjson.com/products?limit=100');
-const data = await response.json();
+const state: IState = {
+  filters: {
+    category: [],
+    brand: [],
+  },
+};
+
+const data = dataJson;
+console.log(data);
 
 const mainElem: HTMLElement | null = document.querySelector('.main');
 if (!mainElem) {
   throw new Error('not found main element');
 }
 
-console.log(data);
+const productList = new ProductList(data.products);
+const filters = new Filters(dataCategory, dataBrand);
 
-const renderAllProducts = (parentElem: HTMLElement) => {
-  parentElem.innerHTML = '';
-  data.products.forEach((productData: IProduct) => {
-    const item = new Product(productData, (...args) => {
-      console.log('product id', [...args][0]);
-      history.pushState(null, '', `/product/${[...args][0]}`);
-      parentElem.innerHTML = '';
-      parentElem.append(item.element);
-    });
-    parentElem.append(item.element);
-  });
-};
+const testObserver = new Observer<IProduct[]>();
+testObserver.subscribe(productList.updateItems.bind(productList));
 
-// renderAllProducts(mainElem);
+filters.element.addEventListener('click', (e) => {
+  if (e.target instanceof HTMLInputElement) {
+    const indCategory = state.filters.category.indexOf(e.target.id);
+    e.target.checked && indCategory === -1
+      ? state.filters.category.push(e.target.id)
+      : state.filters.category.splice(indCategory, 1);
+
+    let filteredData = data.products;
+
+    if (state.filters.category.length) {
+      filteredData = data.products.filter((product) => {
+        return state.filters.category.indexOf(product.category) > -1;
+      });
+    }
+
+    console.log('state-->', state);
+
+    testObserver.broadcast(filteredData);
+  }
+});
+
+// productList.element.addEventListener('click', () => {
+//   testObserver.broadcast('test broadcast from click on product list');
+// });
 
 new Router([
   {
@@ -39,7 +66,9 @@ new Router([
   {
     path: '/',
     view: () => {
-      renderAllProducts(mainElem);
+      mainElem.replaceChildren();
+      mainElem.append(filters.element);
+      mainElem.append(productList.element);
     },
   },
   {

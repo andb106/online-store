@@ -16,3 +16,12 @@ export interface IRoute {
   path: string;
   view: (params: { [k: string]: string }) => void;
 }
+
+export interface IState {
+  filters: Filters;
+}
+
+export interface Filters {
+  category: string[];
+  brand: string[];
+}

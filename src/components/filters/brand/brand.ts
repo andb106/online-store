@@ -19,7 +19,7 @@ export class Brand extends BaseComponent {
       checkboxItem.element.innerHTML = `
       <input type="checkbox" id="${brand}" />
       <label for="${brand}">${brand}</label>
-      <span>??/5</span>
+      <span>?/?</span>
       `;
       list.element.append(checkboxItem.element);
     });

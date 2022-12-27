@@ -18,10 +18,10 @@ export interface IRoute {
 }
 
 export interface IState {
-  filters: Filters;
+  filters: IFilters;
 }
 
-export interface Filters {
+export interface IFilters {
   category: string[];
   brand: string[];
 }

@@ -32,16 +32,27 @@ testObserver.subscribe(productList.updateItems.bind(productList));
 
 filters.element.addEventListener('click', (e) => {
   if (e.target instanceof HTMLInputElement) {
-    const indCategory = state.filters.category.indexOf(e.target.id);
-    e.target.checked && indCategory === -1
-      ? state.filters.category.push(e.target.id)
-      : state.filters.category.splice(indCategory, 1);
+    const filterType = e.target.closest('.filter-list')?.previousSibling?.textContent?.toLocaleLowerCase();
+    console.log('filterType', filterType);
+
+    if (filterType === 'category' || filterType === 'brand') {
+      const ind = state.filters[filterType].indexOf(e.target.id);
+      e.target.checked && ind === -1
+        ? state.filters[filterType].push(e.target.id)
+        : state.filters[filterType].splice(ind, 1);
+    }
 
     let filteredData = data.products;
 
     if (state.filters.category.length) {
-      filteredData = data.products.filter((product) => {
+      filteredData = filteredData.filter((product) => {
         return state.filters.category.indexOf(product.category) > -1;
+      });
+    }
+
+    if (state.filters.brand.length) {
+      filteredData = filteredData.filter((product) => {
+        return state.filters.brand.indexOf(product.brand) > -1;
       });
     }
 

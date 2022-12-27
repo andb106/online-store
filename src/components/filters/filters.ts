@@ -1,3 +1,4 @@
+import './filters.scss';
 import { BaseComponent } from '../baseComponent';
 import { Brand } from './brand/brand';
 import { Category } from './category/category';

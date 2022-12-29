@@ -4,12 +4,12 @@ import 'nouislider/dist/nouislider.css';
 import { BaseComponent } from '../../baseComponent';
 
 export class Price extends BaseComponent {
-  constructor() {
+  constructor(callbackPrice: (values: (string | number)[]) => void) {
     super('div', 'price');
-    this.addItems();
+    this.addItems(callbackPrice);
   }
 
-  addItems() {
+  addItems(dualSliderCallback: (values: (string | number)[]) => void) {
     const title = new BaseComponent('h3', 'filter-title');
     title.element.textContent = 'Price';
     this.element.append(title.element);
@@ -18,12 +18,12 @@ export class Price extends BaseComponent {
     slider.element.setAttribute('id', 'slider-round');
 
     const dualSlider = noUiSlider.create(slider.element, {
-      start: [200, 800],
+      start: [10, 1749],
       connect: true,
       step: 1,
       range: {
-        min: 0,
-        max: 1000,
+        min: 10,
+        max: 1749,
       },
       // tooltips: true,
       tooltips: {
@@ -34,7 +34,8 @@ export class Price extends BaseComponent {
       },
     });
 
-    dualSlider.on('update', (values) => console.log('dual slider values', values));
+    // dualSlider.on('update', (values) => console.log('dual slider values', values));
+    dualSlider.on('change', dualSliderCallback);
 
     this.element.append(slider.element);
   }

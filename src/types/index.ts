@@ -24,4 +24,8 @@ export interface IState {
 export interface IFilters {
   category: string[];
   brand: string[];
+  price: {
+    min: number;
+    max: number;
+  };
 }

@@ -6,13 +6,17 @@ import { ProductList } from './components/productList/productList';
 import dataJson from './data/data.json';
 import { dataCategory, dataBrand } from './data/dataFilters';
 import { Filters } from './components/filters/filters';
-import { Observer } from './utils/observer';
+// import { Observer } from './utils/observer';
 import { IProduct, IState } from './types';
 
 const state: IState = {
   filters: {
     category: [],
     brand: [],
+    price: {
+      min: 0,
+      max: 1749,
+    },
   },
 };
 
@@ -24,11 +28,41 @@ if (!mainElem) {
   throw new Error('not found main element');
 }
 
-const productList = new ProductList(data.products);
-const filters = new Filters(dataCategory, dataBrand);
+const filterData = (data: IProduct[], state: IState) => {
+  let res = data;
 
-const testObserver = new Observer<IProduct[]>();
-testObserver.subscribe(productList.updateItems.bind(productList));
+  if (state.filters.category.length) {
+    res = res.filter((product) => {
+      return state.filters.category.indexOf(product.category) > -1;
+    });
+  }
+
+  if (state.filters.brand.length) {
+    res = res.filter((product) => {
+      return state.filters.brand.indexOf(product.brand) > -1;
+    });
+  }
+
+  res = res.filter((product) => {
+    return product.price >= state.filters.price.min && product.price <= state.filters.price.max;
+  });
+
+  return res;
+};
+
+const productList = new ProductList(data.products);
+const filters = new Filters(dataCategory, dataBrand, (values) => {
+  console.log(`dual slider, min value: ${+values[0]}, max value: ${+values[1]}`);
+  state.filters.price.min = +values[0];
+  state.filters.price.max = +values[1];
+  console.log(`change state from dual slider (price) -->`, state);
+
+  const resFilteredData = filterData(data.products, state);
+  productList.updateItems(resFilteredData);
+});
+
+// const testObserver = new Observer<IProduct[]>();
+// testObserver.subscribe(productList.updateItems.bind(productList));
 
 filters.element.addEventListener('click', (e) => {
   if (e.target instanceof HTMLInputElement) {
@@ -42,23 +76,12 @@ filters.element.addEventListener('click', (e) => {
         : state.filters[filterType].splice(ind, 1);
     }
 
-    let filteredData = data.products;
+    const resFilteredData = filterData(data.products, state);
 
-    if (state.filters.category.length) {
-      filteredData = filteredData.filter((product) => {
-        return state.filters.category.indexOf(product.category) > -1;
-      });
-    }
+    console.log(`change state from ${filterType}-->`, state);
 
-    if (state.filters.brand.length) {
-      filteredData = filteredData.filter((product) => {
-        return state.filters.brand.indexOf(product.brand) > -1;
-      });
-    }
-
-    console.log('state-->', state);
-
-    testObserver.broadcast(filteredData);
+    // testObserver.broadcast(resFilteredData);
+    productList.updateItems(resFilteredData);
   }
 });
 

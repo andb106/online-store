@@ -17,6 +17,10 @@ const state: IState = {
       min: 0,
       max: 1749,
     },
+    stock: {
+      min: 2,
+      max: 150,
+    },
   },
 };
 
@@ -47,19 +51,34 @@ const filterData = (data: IProduct[], state: IState) => {
     return product.price >= state.filters.price.min && product.price <= state.filters.price.max;
   });
 
+  res = res.filter((product) => {
+    return product.stock >= state.filters.stock.min && product.stock <= state.filters.stock.max;
+  });
+
   return res;
 };
 
 const productList = new ProductList(data.products);
-const filters = new Filters(dataCategory, dataBrand, (values) => {
-  console.log(`dual slider, min value: ${+values[0]}, max value: ${+values[1]}`);
-  state.filters.price.min = +values[0];
-  state.filters.price.max = +values[1];
-  console.log(`change state from dual slider (price) -->`, state);
+const filters = new Filters(
+  dataCategory,
+  dataBrand,
+  (values) => {
+    state.filters.price.min = +values[0];
+    state.filters.price.max = +values[1];
+    console.log(`change state from dual slider (price) -->`, state);
 
-  const resFilteredData = filterData(data.products, state);
-  productList.updateItems(resFilteredData);
-});
+    const resFilteredData = filterData(data.products, state);
+    productList.updateItems(resFilteredData);
+  },
+  (values) => {
+    state.filters.stock.min = +values[0];
+    state.filters.stock.max = +values[1];
+    console.log(`change state from dual slider (stock) -->`, state);
+
+    const resFilteredData = filterData(data.products, state);
+    productList.updateItems(resFilteredData);
+  }
+);
 
 // const testObserver = new Observer<IProduct[]>();
 // testObserver.subscribe(productList.updateItems.bind(productList));
@@ -67,7 +86,6 @@ const filters = new Filters(dataCategory, dataBrand, (values) => {
 filters.element.addEventListener('click', (e) => {
   if (e.target instanceof HTMLInputElement) {
     const filterType = e.target.closest('.filter-list')?.previousSibling?.textContent?.toLocaleLowerCase();
-    console.log('filterType', filterType);
 
     if (filterType === 'category' || filterType === 'brand') {
       const ind = state.filters[filterType].indexOf(e.target.id);

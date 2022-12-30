@@ -28,4 +28,8 @@ export interface IFilters {
     min: number;
     max: number;
   };
+  stock: {
+    min: number;
+    max: number;
+  };
 }

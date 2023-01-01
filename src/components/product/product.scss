@@ -18,3 +18,7 @@
   max-height: 200px;
   object-fit: contain;
 }
+
+.product__body {
+  overflow-y: auto;
+}

@@ -19,6 +19,8 @@ export interface IRoute {
 
 export interface IState {
   filters: IFilters;
+  sortParam: number;
+  products: IProduct[];
 }
 
 export interface IFilters {

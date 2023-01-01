@@ -11,7 +11,9 @@ export class Product extends BaseComponent {
     <img src="${data.images[0]}" alt="${data.title}" class="product__image" />
     <div class="product__body">
       <h3 class="product__title">${data.title}</h3>
-      <p class="card-text">$${data.description}</p>
+      <p class="card-text">${data.description}</p>
+      <p class="card-text">Price:${data.price}</p>
+      <p class="card-text">Rating:${data.rating}</p>
     </div>
     `;
     if (cbClick) this.element.onclick = cbClick.bind(this.element, this.id);

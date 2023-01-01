@@ -7,6 +7,8 @@ import dataJson from './data/data.json';
 import { Filters } from './components/filters/filters';
 // import { Observer } from './utils/observer';
 import { IProduct, IState } from './types';
+import { BaseComponent } from './components/baseComponent';
+import { Sort } from './components/sort/sort';
 
 const state: IState = {
   filters: {
@@ -15,6 +17,8 @@ const state: IState = {
     price: [0, 0],
     stock: [0, 0],
   },
+  sortParam: 0,
+  products: [],
 };
 
 const data = dataJson;
@@ -27,6 +31,7 @@ const minMaxStockInitial = minMaxValuesFromData(data.products, 'stock');
 const countItemsCategoryInitial = countItemsForSpan(data.products, data.products, [...categoryList], 'category');
 const countItemsBrandInitial = countItemsForSpan(data.products, data.products, [...brandList], 'brand');
 
+state.products = data.products;
 state.filters.price = minMaxPriceInitial;
 state.filters.stock = minMaxStockInitial;
 
@@ -73,18 +78,20 @@ const filters = new Filters(
     state.filters.price = [+values[0], +values[1]];
     console.log(`change state from dual slider (price) -->`, state);
 
-    const resFilteredData = filterData(data.products, state);
+    let resFilteredData = filterData(data.products, state);
+    resFilteredData = sortProduct(resFilteredData, state.sortParam);
     productList.updateItems(resFilteredData);
-
+    state.products = resFilteredData;
     updateFiltersValues(resFilteredData, data.products, true, false);
   },
   (values) => {
     state.filters.stock = [+values[0], +values[1]];
     console.log(`change state from dual slider (stock) -->`, state);
 
-    const resFilteredData = filterData(data.products, state);
+    let resFilteredData = filterData(data.products, state);
+    resFilteredData = sortProduct(resFilteredData, state.sortParam);
     productList.updateItems(resFilteredData);
-
+    state.products = resFilteredData;
     updateFiltersValues(resFilteredData, data.products, false, true);
   }
 );
@@ -103,8 +110,9 @@ filters.element.addEventListener('click', (e) => {
         : state.filters[filterType].splice(ind, 1);
     }
 
-    const resFilteredData = filterData(data.products, state);
-
+    let resFilteredData = filterData(data.products, state);
+    resFilteredData = sortProduct(resFilteredData, state.sortParam);
+    state.products = resFilteredData;
     console.log(`change state from ${filterType}-->`, state);
 
     // testObserver.broadcast(resFilteredData);
@@ -118,6 +126,17 @@ filters.element.addEventListener('click', (e) => {
 //   testObserver.broadcast('test broadcast from click on product list');
 // });
 
+const filtersProductsWrapper = new BaseComponent('div', 'filters-products');
+const bar = new BaseComponent('div', 'bar');
+const sort = new Sort();
+sort.selectElem.addEventListener('change', (e) => {
+  if (e.target instanceof HTMLSelectElement) {
+    state.sortParam = +e.target.value;
+    const sortedProducts = sortProduct(state.products, +e.target.value);
+    productList.updateItems(sortedProducts);
+  }
+});
+
 new Router([
   {
     path: 'page 404',
@@ -130,8 +149,10 @@ new Router([
     path: '/',
     view: () => {
       mainElem.replaceChildren();
-      mainElem.append(filters.element);
-      mainElem.append(productList.element);
+      bar.element.append(sort.element);
+      mainElem.append(bar.element);
+      filtersProductsWrapper.element.append(filters.element, productList.element);
+      mainElem.append(filtersProductsWrapper.element);
     },
   },
   {
@@ -202,5 +223,20 @@ function updateFiltersValues(
 
   if (isCallingInStock) {
     filters.sliderFilters[0].slider?.set(minMaxPrice);
+  }
+}
+
+function sortProduct(products: IProduct[], sortParam: number) {
+  switch (sortParam) {
+    case 1:
+      return products.sort((a, b) => a.price - b.price);
+    case 2:
+      return products.sort((a, b) => b.price - a.price);
+    case 3:
+      return products.sort((a, b) => a.rating - b.rating);
+    case 4:
+      return products.sort((a, b) => b.rating - a.rating);
+    default:
+      return products;
   }
 }

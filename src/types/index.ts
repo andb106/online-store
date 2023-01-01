@@ -24,14 +24,8 @@ export interface IState {
 export interface IFilters {
   category: string[];
   brand: string[];
-  price: {
-    min: number;
-    max: number;
-  };
-  stock: {
-    min: number;
-    max: number;
-  };
+  price: number[];
+  stock: number[];
 }
 
 export type SliderCallBack = (values: (string | number)[]) => void;

@@ -5,8 +5,10 @@ import { BaseComponent } from '../baseComponent';
 import { SliderOptions } from '../../types';
 
 export class Slider extends BaseComponent {
+  slider: noUiSlider.API | null;
   constructor(options: SliderOptions) {
     super('div', options.caption.toLowerCase());
+    this.slider = null;
     this.addItems(options);
   }
 
@@ -36,6 +38,7 @@ export class Slider extends BaseComponent {
 
     dualSlider.on('change', callback);
 
+    this.slider = dualSlider;
     this.element.append(slider.element);
   }
 }

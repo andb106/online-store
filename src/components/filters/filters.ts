@@ -5,11 +5,16 @@ import { SliderCallBack, SliderOptions } from '../../types';
 import { Slider } from './slider';
 
 export class Filters extends BaseComponent {
-  filters: Array<CheckBoxFilter | Slider>;
+  checkBoxFilters: Array<CheckBoxFilter>;
+  sliderFilters: Array<Slider>;
 
   constructor(
     dataCategory: string[],
+    itemCountsCategory: number[][],
     dataBrand: string[],
+    itemCountsBrand: number[][],
+    minMaxPrice: number[],
+    minMaxStock: number[],
     callbackPrice: SliderCallBack,
     callbackStock: SliderCallBack
   ) {
@@ -17,24 +22,25 @@ export class Filters extends BaseComponent {
 
     const priceOptions: SliderOptions = {
       caption: 'Price',
-      min: 10,
-      max: 1749,
+      min: minMaxPrice[0],
+      max: minMaxPrice[1],
       callback: callbackPrice,
     };
     const stockOptions: SliderOptions = {
       caption: 'Stock',
-      min: 2,
-      max: 150,
+      min: minMaxStock[0],
+      max: minMaxStock[1],
       callback: callbackStock,
     };
 
-    this.filters = [
-      new CheckBoxFilter(dataCategory, 'Category'),
-      new CheckBoxFilter(dataBrand, 'Brand'),
-      new Slider(priceOptions),
-      new Slider(stockOptions),
+    this.checkBoxFilters = [
+      new CheckBoxFilter(dataCategory, 'Category', itemCountsCategory),
+      new CheckBoxFilter(dataBrand, 'Brand', itemCountsBrand),
     ];
 
-    this.filters.forEach(({ element }) => this.element.append(element));
+    this.sliderFilters = [new Slider(priceOptions), new Slider(stockOptions)];
+
+    this.checkBoxFilters.forEach(({ element }) => this.element.append(element));
+    this.sliderFilters.forEach(({ element }) => this.element.append(element));
   }
 }

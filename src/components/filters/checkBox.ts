@@ -1,9 +1,12 @@
 import { BaseComponent } from '../baseComponent';
 
 export class CheckBoxFilter extends BaseComponent {
-  constructor(data: string[], caption: string) {
+  list: HTMLElement | null;
+  constructor(data: string[], caption: string, itemCounts: number[][]) {
     super('div', caption.toLowerCase());
+    this.list = null;
     this.addItems(data, caption);
+    this.updateList(itemCounts);
   }
 
   addItems(data: string[], caption: string) {
@@ -23,7 +26,19 @@ export class CheckBoxFilter extends BaseComponent {
       `;
       list.element.append(checkboxItem.element);
     });
-
+    this.list = list.element;
     this.element.append(list.element);
+  }
+
+  updateList(itemCounts: number[][]) {
+    if (this.list) {
+      [...this.list.children].forEach((item, i) => {
+        const spanElem = item.lastElementChild as HTMLSpanElement;
+        spanElem.textContent = `${itemCounts[i][0]}/${itemCounts[i][1]}`;
+
+        // const checkboxElem = item.firstElementChild as HTMLInputElement;
+        // checkboxElem.checked = true;
+      });
+    }
   }
 }

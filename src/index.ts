@@ -4,7 +4,6 @@ import './styles-global.scss';
 import Router from './utils/router';
 import { ProductList } from './components/productList/productList';
 import dataJson from './data/data.json';
-import { dataCategory, dataBrand } from './data/dataFilters';
 import { Filters } from './components/filters/filters';
 // import { Observer } from './utils/observer';
 import { IProduct, IState } from './types';
@@ -25,7 +24,8 @@ const state: IState = {
 };
 
 const data = dataJson;
-console.log(data);
+const categoryList = new Set(data.products.map((product) => product.category));
+const brandList = new Set(data.products.map((product) => product.brand));
 
 const mainElem: HTMLElement | null = document.querySelector('.main');
 if (!mainElem) {
@@ -60,8 +60,8 @@ const filterData = (data: IProduct[], state: IState) => {
 
 const productList = new ProductList(data.products);
 const filters = new Filters(
-  dataCategory,
-  dataBrand,
+  [...categoryList],
+  [...brandList],
   (values) => {
     state.filters.price.min = +values[0];
     state.filters.price.max = +values[1];

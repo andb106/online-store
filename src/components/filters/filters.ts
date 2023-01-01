@@ -1,13 +1,12 @@
 import './filters.scss';
 import { BaseComponent } from '../baseComponent';
-import { Brand } from './brand/brand';
-import { Category } from './category/category';
 import { Price } from './price/price';
 import { Stock } from './stock/stock';
+import { CheckBoxFilter } from './checkBox';
 
 export class Filters extends BaseComponent {
-  category: Category;
-  brand: Brand;
+  category: CheckBoxFilter;
+  brand: CheckBoxFilter;
   price: Price;
   stock: Stock;
 
@@ -18,8 +17,8 @@ export class Filters extends BaseComponent {
     callbackStock: (values: (string | number)[]) => void
   ) {
     super('div', 'filters');
-    this.category = new Category(dataCategory);
-    this.brand = new Brand(dataBrand);
+    this.category = new CheckBoxFilter(dataCategory, 'Category');
+    this.brand = new CheckBoxFilter(dataBrand, 'Brand');
     this.price = new Price(callbackPrice);
     this.stock = new Stock(callbackStock);
 

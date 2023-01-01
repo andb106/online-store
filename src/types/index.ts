@@ -33,3 +33,12 @@ export interface IFilters {
     max: number;
   };
 }
+
+export type SliderCallBack = (values: (string | number)[]) => void;
+
+export type SliderOptions = {
+  caption: string;
+  min: number;
+  max: number;
+  callback: SliderCallBack;
+};

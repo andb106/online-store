@@ -10,6 +10,8 @@ import { IProduct, IState } from './types';
 import { BaseComponent } from './components/baseComponent';
 import { Sort } from './components/sort/sort';
 import { Search } from './components/search/search';
+import { Found } from './components/found/found';
+import { ResetBtn } from './components/resetBtn/resetBtn';
 
 const state: IState = {
   filters: {
@@ -118,6 +120,11 @@ const searchElem = new Search((value) => {
   searchFilterSortUpdateProducts(data.products, state, false, false);
 });
 
+const found = new Found();
+const resetBtn = new ResetBtn(() => {
+  resetFilters();
+});
+
 new Router([
   {
     path: 'page 404',
@@ -130,7 +137,9 @@ new Router([
     path: '/',
     view: () => {
       mainElem.replaceChildren();
+      bar.element.append(resetBtn.element);
       bar.element.append(sort.element);
+      bar.element.append(found.element);
       bar.element.append(searchElem.element);
       mainElem.append(bar.element);
       filtersProductsWrapper.element.append(filters.element, productList.element);
@@ -247,4 +256,21 @@ function searchFilterSortUpdateProducts(
   productList.updateItems(resFilteredData);
   state.products = resFilteredData;
   updateFiltersValues(resFilteredData, allProducts, isCallingInPrice, isCallingInStock);
+  found.updateCount(state.products.length);
+}
+
+function resetFilters() {
+  state.products = data.products;
+  state.searchValue = '';
+  state.filters.price = minMaxPriceInitial;
+  state.filters.stock = minMaxStockInitial;
+  state.filters.brand = [];
+  state.filters.category = [];
+  state.sortParam = 0;
+  searchFilterSortUpdateProducts(data.products, state, false, false);
+  sort.selectElem.selectedIndex = 0;
+  searchElem.resetInput();
+  filters.checkBoxFilters.forEach((filter) => {
+    filter.resetChecked();
+  });
 }

@@ -41,4 +41,13 @@ export class CheckBoxFilter extends BaseComponent {
       });
     }
   }
+
+  resetChecked() {
+    if (this.list) {
+      [...this.list.children].forEach((item) => {
+        const checkboxElem = item.firstElementChild as HTMLInputElement;
+        checkboxElem.checked = false;
+      });
+    }
+  }
 }

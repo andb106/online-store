@@ -1,7 +1,7 @@
 import { BaseComponent } from '../baseComponent';
 
 export class Sort extends BaseComponent {
-  selectElem: HTMLElement;
+  selectElem: HTMLSelectElement;
 
   constructor() {
     super('div', 'sort');
@@ -13,7 +13,7 @@ export class Sort extends BaseComponent {
       <option value=3>rating from min</option>
       <option value=4>rating from max</option>
     `;
-    const selectElem = select.element;
+    const selectElem = select.element as HTMLSelectElement;
     this.selectElem = selectElem;
     this.element.append(selectElem);
   }

@@ -10,4 +10,9 @@ export class Search extends BaseComponent {
     };
     this.element.append(searchInput);
   }
+
+  resetInput() {
+    const input = this.element.firstChild as HTMLInputElement;
+    input.value = '';
+  }
 }

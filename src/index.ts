@@ -9,6 +9,7 @@ import { Filters } from './components/filters/filters';
 import { IProduct, IState } from './types';
 import { BaseComponent } from './components/baseComponent';
 import { Sort } from './components/sort/sort';
+import { Search } from './components/search/search';
 
 const state: IState = {
   filters: {
@@ -18,6 +19,7 @@ const state: IState = {
     stock: [0, 0],
   },
   sortParam: 0,
+  searchValue: '',
   products: [],
 };
 
@@ -76,28 +78,13 @@ const filters = new Filters(
   minMaxStockInitial,
   (values) => {
     state.filters.price = [+values[0], +values[1]];
-    console.log(`change state from dual slider (price) -->`, state);
-
-    let resFilteredData = filterData(data.products, state);
-    resFilteredData = sortProduct(resFilteredData, state.sortParam);
-    productList.updateItems(resFilteredData);
-    state.products = resFilteredData;
-    updateFiltersValues(resFilteredData, data.products, true, false);
+    searchFilterSortUpdateProducts(data.products, state, true, false);
   },
   (values) => {
     state.filters.stock = [+values[0], +values[1]];
-    console.log(`change state from dual slider (stock) -->`, state);
-
-    let resFilteredData = filterData(data.products, state);
-    resFilteredData = sortProduct(resFilteredData, state.sortParam);
-    productList.updateItems(resFilteredData);
-    state.products = resFilteredData;
-    updateFiltersValues(resFilteredData, data.products, false, true);
+    searchFilterSortUpdateProducts(data.products, state, false, true);
   }
 );
-
-// const testObserver = new Observer<IProduct[]>();
-// testObserver.subscribe(productList.updateItems.bind(productList));
 
 filters.element.addEventListener('click', (e) => {
   if (e.target instanceof HTMLInputElement) {
@@ -109,25 +96,13 @@ filters.element.addEventListener('click', (e) => {
         ? state.filters[filterType].push(e.target.id)
         : state.filters[filterType].splice(ind, 1);
     }
-
-    let resFilteredData = filterData(data.products, state);
-    resFilteredData = sortProduct(resFilteredData, state.sortParam);
-    state.products = resFilteredData;
-    console.log(`change state from ${filterType}-->`, state);
-
-    // testObserver.broadcast(resFilteredData);
-    productList.updateItems(resFilteredData);
-
-    updateFiltersValues(resFilteredData, data.products, false, false);
+    searchFilterSortUpdateProducts(data.products, state, false, false);
   }
 });
 
-// productList.element.addEventListener('click', () => {
-//   testObserver.broadcast('test broadcast from click on product list');
-// });
-
 const filtersProductsWrapper = new BaseComponent('div', 'filters-products');
 const bar = new BaseComponent('div', 'bar');
+
 const sort = new Sort();
 sort.selectElem.addEventListener('change', (e) => {
   if (e.target instanceof HTMLSelectElement) {
@@ -135,6 +110,12 @@ sort.selectElem.addEventListener('change', (e) => {
     const sortedProducts = sortProduct(state.products, +e.target.value);
     productList.updateItems(sortedProducts);
   }
+});
+
+const searchElem = new Search((value) => {
+  const searchValue = value;
+  state.searchValue = searchValue;
+  searchFilterSortUpdateProducts(data.products, state, false, false);
 });
 
 new Router([
@@ -150,6 +131,7 @@ new Router([
     view: () => {
       mainElem.replaceChildren();
       bar.element.append(sort.element);
+      bar.element.append(searchElem.element);
       mainElem.append(bar.element);
       filtersProductsWrapper.element.append(filters.element, productList.element);
       mainElem.append(filtersProductsWrapper.element);
@@ -239,4 +221,30 @@ function sortProduct(products: IProduct[], sortParam: number) {
     default:
       return products;
   }
+}
+
+function searchProducts(data: IProduct[], searchValue: string) {
+  const res = data.filter((product) => {
+    const strFromProps = Object.values(product).slice(1, -2).join(' ').toLowerCase();
+    if (strFromProps.includes(searchValue)) {
+      return true;
+    } else {
+      return false;
+    }
+  });
+  return res;
+}
+
+function searchFilterSortUpdateProducts(
+  allProducts: IProduct[],
+  state: IState,
+  isCallingInPrice = false,
+  isCallingInStock = false
+) {
+  const searchedData = searchProducts(allProducts, state.searchValue);
+  let resFilteredData = filterData(searchedData, state);
+  resFilteredData = sortProduct(resFilteredData, state.sortParam);
+  productList.updateItems(resFilteredData);
+  state.products = resFilteredData;
+  updateFiltersValues(resFilteredData, allProducts, isCallingInPrice, isCallingInStock);
 }

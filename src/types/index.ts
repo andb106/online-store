@@ -20,6 +20,7 @@ export interface IRoute {
 export interface IState {
   filters: IFilters;
   sortParam: number;
+  searchValue: string;
   products: IProduct[];
 }
 

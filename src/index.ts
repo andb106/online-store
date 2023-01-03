@@ -1,4 +1,5 @@
 import { Product } from './components/product/product';
+import { ProductPage } from './components/product-page/product-page';
 import './styles-global.scss';
 import { IProduct } from './types';
 import Router from './utils/router';
@@ -11,7 +12,7 @@ if (!mainElem) {
   throw new Error('not found main element');
 }
 
-console.log(data);
+//console.log(data);
 
 const renderAllProducts = (parentElem: HTMLElement) => {
   parentElem.innerHTML = '';
@@ -55,7 +56,7 @@ new Router([
       const len = data.products.length;
       mainElem.innerHTML = '';
       if (+params.id - 1 >= 0 && +params.id - 1 < len) {
-        mainElem.append(new Product(data.products[+params.id - 1]).element);
+        mainElem.append(new ProductPage(data.products[+params.id - 1]).element);
       } else {
         mainElem.innerHTML = `Product with id ${params.id} not found`;
       }

@@ -80,7 +80,16 @@ footer .copyright:before {
   transition: 0.3s;
 }
 
-main {
+.main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  flex-wrap: wrap;
+  // justify-content: center;
+  // align-items: center;
+}
+
+.filters-products {
   display: flex;
   flex: 1;
   gap: 50px;
@@ -90,4 +99,16 @@ main {
   @media (max-width: 1050px) {
     gap: unset;
   }
+}
+
+.bar {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  border: 1px solid white;
+  border-radius: 10px;
+  text-align: center;
+  margin-bottom: 10px;
+  padding: 10px;
+  align-items: center;
 }

@@ -21,3 +21,26 @@ export interface ICartItem {
   productId: number;
   number: number;
 }
+
+export interface IState {
+  filters: IFilters;
+  sortParam: number;
+  searchValue: string;
+  products: IProduct[];
+}
+
+export interface IFilters {
+  category: string[];
+  brand: string[];
+  price: number[];
+  stock: number[];
+}
+
+export type SliderCallBack = (values: (string | number)[]) => void;
+
+export type SliderOptions = {
+  caption: string;
+  min: number;
+  max: number;
+  callback: SliderCallBack;
+};

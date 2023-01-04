@@ -1,14 +1,15 @@
-import { ICartItem } from './../../types/index';
 import { IProduct } from '../../types/index';
 import { BaseComponent } from '../baseComponent';
+import { addToCart, checkProductInCart, changeCartBtn } from '../../utils/db';
 import './product-page.scss';
 
 export class ProductPage extends BaseComponent {
-  id: number;
   constructor(data: IProduct) {
     super('div', 'item');
-    this.id = data.id;
     this.element.innerHTML = `
+        <p class="item__breadcrumbs">
+          Главная / ${data.category} / ${data.brand} / ${data.title}
+        </p>
         <div class="item__main">
           <div class="item__photos">
             <div class="item__add-photos">
@@ -21,8 +22,14 @@ export class ProductPage extends BaseComponent {
           <div class="item__text">
             <div class="item__info">
               <h3 class="item__title">${data.title}</h3>
-              <p class="item__category">Категория: ${data.category}</p>
-              <span class="item__price">${data.price}$</span>
+              <p class="item__info-one">Категория: ${data.category}</p>
+              <p class="item__info-one">Бренд: ${data.brand}</p>
+              <p class="item__info-one">На складе: ${data.stock} штук</p>
+              <p class="item__info-one">Рейтинг: ${data.rating}/5</p>
+              <div class="item__sum">
+                <span class="item__price">${data.price}$</span>
+                <span class="item__discount">${data.discountPercentage}%</span>
+              </div>
             </div>
             <p class="item__description">${data.description}</p>
           </div>
@@ -37,49 +44,42 @@ export class ProductPage extends BaseComponent {
     `;
     const images: HTMLElement[] = Array.from(this.element.querySelectorAll('.item__img--small'));
     const mainImg: HTMLElement | null = this.element.querySelector('#itemMainImg');
-    images.forEach((x) =>
-      x.addEventListener('click', function () {
-        if (mainImg !== null) {
-          const newIdx: number = images.indexOf(x) === 2 ? 3 : (images.indexOf(x) + 1) % 3;
-          mainImg.setAttribute('src', data.images[newIdx]);
-        }
-      })
-    );
     const modal: HTMLElement | null = this.element.querySelector('.item__modal');
     const modalImg: HTMLElement | null = this.element.querySelector('#itemModalImg');
-    mainImg?.addEventListener('click', function () {
-      const imgPath: string | null = mainImg.getAttribute('src');
-      imgPath !== null ? modalImg?.setAttribute('src', imgPath) : null;
-      modal?.classList.add('item__modal--visible');
-    });
-    modal?.addEventListener('click', function () {
-      modal?.classList.remove('item__modal--visible');
-    });
+    if (mainImg !== null && modalImg !== null && modal !== null) {
+      this.setImageChange(images, mainImg, data);
+      this.setModal(mainImg, modalImg, modal);
+    }
     const btnCart: HTMLElement | null = this.element.querySelector('.item__cart');
-    btnCart?.addEventListener('click', function () {
-      let cartArr: ICartItem[] | ICartItem = JSON.parse(localStorage.getItem('cart') || '[]');
-      if (!Array.isArray(cartArr)) {
-        cartArr.productId === data.id
-          ? (cartArr.number += 1)
-          : (cartArr = [
-              cartArr,
-              {
-                productId: data.id,
-                number: 1,
-              },
-            ]);
-      } else if (Array.isArray(cartArr)) {
-        const existedIdx: number = cartArr.findIndex((x) => x.productId === data.id);
-        existedIdx !== -1
-          ? (cartArr[existedIdx].number += 1)
-          : cartArr.push({
-              productId: data.id,
-              number: 1,
-            });
+    if (btnCart !== null) {
+      if (!checkProductInCart(data.id)) {
+        btnCart.addEventListener('click', function () {
+          addToCart(data.id, 1, data.price);
+          changeCartBtn(btnCart);
+        });
+      } else {
+        changeCartBtn(btnCart);
       }
-      localStorage.setItem('cart', JSON.stringify(cartArr));
-      const sum: number = Number(localStorage.getItem('sum') || '0') + 1;
-      localStorage.setItem('sum', sum.toString());
+    }
+  }
+
+  setImageChange(images: HTMLElement[], mainImg: HTMLElement, data: IProduct) {
+    images.forEach((x) =>
+      x.addEventListener('click', function () {
+        const newIdx: number = images.indexOf(x) === 2 ? 3 : (images.indexOf(x) + 1) % 3;
+        mainImg.setAttribute('src', data.images[newIdx]);
+      })
+    );
+  }
+
+  setModal(mainImg: HTMLElement, modalImg: HTMLElement, modal: HTMLElement) {
+    mainImg.addEventListener('click', function () {
+      const imgPath: string | null = mainImg.getAttribute('src');
+      imgPath !== null ? modalImg.setAttribute('src', imgPath) : null;
+      modal.classList.add('item__modal--visible');
+    });
+    modal.addEventListener('click', function () {
+      modal.classList.remove('item__modal--visible');
     });
   }
 }

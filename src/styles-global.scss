@@ -117,6 +117,11 @@ footer .copyright:before {
   &:hover {
     opacity: .5;
   }
+
+  &--disabled {
+    pointer-events: none;
+    opacity: .2;
+  }
 }
 
 .bar {

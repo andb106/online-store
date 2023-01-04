@@ -7,7 +7,7 @@ import { ProductList } from './components/productList/productList';
 import dataJson from './data/data.json';
 import { Filters } from './components/filters/filters';
 // import { Observer } from './utils/observer';
-import { IProduct, IState } from './types';
+import { IFilters, IProduct, IState } from './types';
 import { BaseComponent } from './components/baseComponent';
 import { Sort } from './components/sort/sort';
 import { Search } from './components/search/search';
@@ -82,10 +82,12 @@ const filters = new Filters(
   (values) => {
     state.filters.price = [+values[0], +values[1]];
     searchFilterSortUpdateProducts(data.products, state, true, false);
+    changeUrl('price', state);
   },
   (values) => {
     state.filters.stock = [+values[0], +values[1]];
     searchFilterSortUpdateProducts(data.products, state, false, true);
+    changeUrl('stock', state);
   }
 );
 
@@ -98,6 +100,8 @@ filters.element.addEventListener('click', (e) => {
       e.target.checked && ind === -1
         ? state.filters[filterType].push(e.target.id)
         : state.filters[filterType].splice(ind, 1);
+
+      changeUrl(filterType, state);
     }
     searchFilterSortUpdateProducts(data.products, state, false, false);
   }
@@ -112,6 +116,7 @@ sort.selectElem.addEventListener('change', (e) => {
     state.sortParam = +e.target.value;
     const sortedProducts = sortProduct(state.products, +e.target.value);
     productList.updateItems(sortedProducts);
+    changeUrl('sortParam', state);
   }
 });
 
@@ -119,6 +124,7 @@ const searchElem = new Search((value) => {
   const searchValue = value;
   state.searchValue = searchValue;
   searchFilterSortUpdateProducts(data.products, state, false, false);
+  changeUrl('searchValue', state);
 });
 
 const found = new Found();
@@ -151,13 +157,19 @@ new Router([
             const value = param[1].split(',').map((item) => Number(item));
             state.filters[key] = value;
           }
+          if (key === 'searchValue') {
+            state.searchValue = param[1];
+            searchElem.updateInput(param[1]);
+          }
+          if (key === 'sortParam') {
+            state.sortParam = +param[1];
+            sort.selectElem.selectedIndex = +param[1];
+          }
         }
         searchFilterSortUpdateProducts(data.products, state, false, false);
         filters.checkBoxFilters.forEach((item) =>
           item.updateChecked([...state.filters.brand, ...state.filters.category])
         );
-      } else {
-        console.log('no params.urlSearch');
       }
 
       mainElem.replaceChildren();
@@ -297,4 +309,28 @@ function resetFilters() {
   filters.checkBoxFilters.forEach((filter) => {
     filter.resetChecked();
   });
+}
+
+function changeUrl(filterName: string, state: IState) {
+  const urlParams = new URLSearchParams(location.search);
+
+  if (isObjKey<IFilters>(filterName, state.filters)) {
+    state.filters[filterName].length
+      ? urlParams.set(filterName, state.filters[filterName].join(','))
+      : urlParams.delete(filterName);
+  }
+
+  if (isObjKey<IState>(filterName, state)) {
+    state[filterName] ? urlParams.set(filterName, `${state[filterName]}`) : urlParams.delete(filterName);
+  }
+
+  history.pushState(
+    null,
+    '',
+    urlParams.toString().length ? location.pathname + `?${urlParams.toString()}` : location.pathname
+  );
+}
+
+function isObjKey<T extends object>(key: PropertyKey, obj: T): key is keyof T {
+  return key in obj;
 }

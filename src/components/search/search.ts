@@ -15,4 +15,9 @@ export class Search extends BaseComponent {
     const input = this.element.firstChild as HTMLInputElement;
     input.value = '';
   }
+
+  updateInput(value: string) {
+    const input = this.element.firstChild as HTMLInputElement;
+    input.value = value;
+  }
 }

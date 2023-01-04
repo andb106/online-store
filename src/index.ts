@@ -135,7 +135,30 @@ new Router([
   },
   {
     path: '/',
-    view: () => {
+    view: (params) => {
+      resetFilters();
+
+      if (params.urlSearch) {
+        const test2 = new URLSearchParams(params.urlSearch);
+        for (const param of test2) {
+          const key = param[0];
+          if (key === 'category' || key === 'brand') {
+            const value = param[1].split(',');
+            state.filters[key] = value;
+          }
+          if (key === 'price' || key === 'stock') {
+            const value = param[1].split(',').map((item) => Number(item));
+            state.filters[key] = value;
+          }
+        }
+        searchFilterSortUpdateProducts(data.products, state, false, false);
+        filters.checkBoxFilters.forEach((item) =>
+          item.updateChecked([...state.filters.brand, ...state.filters.category])
+        );
+      } else {
+        console.log('no params.urlSearch');
+      }
+
       mainElem.replaceChildren();
       bar.element.append(resetBtn.element);
       bar.element.append(sort.element);

@@ -41,7 +41,10 @@ export default class Router {
       };
     }
 
-    match.route.view(this.getParams(match));
+    const params = this.getParams(match);
+    params.urlSearch = location.search;
+
+    match.route.view(params);
   };
 
   pathToRegex = (path: string) => new RegExp('^' + path.replace(/\//g, '\\/').replace(/:\w+/g, '(.+)') + '$');

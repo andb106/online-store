@@ -17,6 +17,11 @@ export interface IRoute {
   view: (params: { [k: string]: string }) => void;
 }
 
+export interface ICartItem {
+  productId: number;
+  number: number;
+}
+
 export interface IState {
   filters: IFilters;
   sortParam: number;

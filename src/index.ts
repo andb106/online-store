@@ -15,6 +15,7 @@ import { Found } from './components/found/found';
 import { ResetBtn } from './components/resetBtn/resetBtn';
 import { ViewButtons } from './components/viewButtons/viewButtons';
 import { CopyBtn } from './components/copyBtn/copyBtn';
+import { SearchKeys } from './types';
 
 const state: IState = {
   filters: {
@@ -33,11 +34,16 @@ const data = dataJson;
 const categoryList = new Set(data.products.map((product) => product.category));
 const brandList = new Set(data.products.map((product) => product.brand));
 
-const minMaxPriceInitial = minMaxValuesFromData(data.products, 'price');
-const minMaxStockInitial = minMaxValuesFromData(data.products, 'stock');
+const minMaxPriceInitial = minMaxValuesFromData(data.products, SearchKeys.price);
+const minMaxStockInitial = minMaxValuesFromData(data.products, SearchKeys.stock);
 
-const countItemsCategoryInitial = countItemsForSpan(data.products, data.products, [...categoryList], 'category');
-const countItemsBrandInitial = countItemsForSpan(data.products, data.products, [...brandList], 'brand');
+const countItemsCategoryInitial = countItemsForSpan(
+  data.products,
+  data.products,
+  [...categoryList],
+  SearchKeys.category
+);
+const countItemsBrandInitial = countItemsForSpan(data.products, data.products, [...brandList], SearchKeys.brand);
 
 state.products = data.products;
 state.filters.price = minMaxPriceInitial;
@@ -91,13 +97,13 @@ const filters = new Filters(
     state.filters.price = [+values[0], +values[1]];
     searchFilterSortUpdateProducts(data.products, state, true, false);
     setViewMode(state.viewMode);
-    changeUrl('price', state);
+    changeUrl(SearchKeys.price, state);
   },
   (values) => {
     state.filters.stock = [+values[0], +values[1]];
     searchFilterSortUpdateProducts(data.products, state, false, true);
     setViewMode(state.viewMode);
-    changeUrl('stock', state);
+    changeUrl(SearchKeys.stock, state);
   }
 );
 
@@ -105,7 +111,7 @@ filters.element.addEventListener('click', (e) => {
   if (e.target instanceof HTMLInputElement) {
     const filterType = e.target.closest('.filter-list')?.previousSibling?.textContent?.toLocaleLowerCase();
 
-    if (filterType === 'category' || filterType === 'brand') {
+    if (filterType === SearchKeys.category || filterType === SearchKeys.brand) {
       const ind = state.filters[filterType].indexOf(e.target.id);
       e.target.checked && ind === -1
         ? state.filters[filterType].push(e.target.id)
@@ -127,7 +133,7 @@ sort.selectElem.addEventListener('change', (e) => {
     state.sortParam = +e.target.value;
     const sortedProducts = sortProduct(state.products, +e.target.value);
     productList.updateItems(sortedProducts);
-    changeUrl('sortParam', state);
+    changeUrl(SearchKeys.sortParam, state);
   }
 });
 
@@ -136,7 +142,7 @@ const searchElem = new Search((value) => {
   state.searchValue = searchValue;
   searchFilterSortUpdateProducts(data.products, state, false, false);
   setViewMode(state.viewMode);
-  changeUrl('searchValue', state);
+  changeUrl(SearchKeys.searchValue, state);
 });
 
 const found = new Found();
@@ -146,7 +152,7 @@ const resetBtn = new ResetBtn(() => {
 
 const viewBtns = new ViewButtons((value) => {
   state.viewMode = value;
-  changeUrl('viewMode', state);
+  changeUrl(SearchKeys.viewMode, state);
   setViewMode(value);
 });
 
@@ -167,28 +173,34 @@ new Router([
       setViewMode(state.viewMode);
 
       if (params.urlSearch) {
-        const test2 = new URLSearchParams(params.urlSearch);
-        for (const param of test2) {
+        const searchParams = new URLSearchParams(params.urlSearch);
+        for (const param of searchParams) {
           const key = param[0];
-          if (key === 'category' || key === 'brand') {
-            const value = param[1].split(',');
-            state.filters[key] = value;
-          }
-          if (key === 'price' || key === 'stock') {
-            const value = param[1].split(',').map((item) => Number(item));
-            state.filters[key] = value;
-          }
-          if (key === 'searchValue') {
-            state.searchValue = param[1];
-            searchElem.updateInput(param[1]);
-          }
-          if (key === 'sortParam') {
-            state.sortParam = +param[1];
-            sort.selectElem.selectedIndex = +param[1];
-          }
-          if (key === 'viewMode') {
-            state.viewMode = param[1];
-            viewBtns.updateActiveBtn(param[1]);
+          switch (key) {
+            case SearchKeys.category:
+            case SearchKeys.brand:
+              state.filters[key] = param[1].split(',');
+              break;
+
+            case SearchKeys.price:
+            case SearchKeys.stock:
+              state.filters[key] = param[1].split(',').map((item) => Number(item));
+              break;
+
+            case SearchKeys.searchValue:
+              state.searchValue = param[1];
+              searchElem.updateInput(param[1]);
+              break;
+
+            case SearchKeys.sortParam:
+              state.sortParam = +param[1];
+              sort.selectElem.selectedIndex = +param[1];
+              break;
+
+            case SearchKeys.viewMode:
+              state.viewMode = param[1];
+              viewBtns.updateActiveBtn(param[1]);
+              break;
           }
         }
         searchFilterSortUpdateProducts(data.products, state, false, false);
@@ -199,14 +211,9 @@ new Router([
       }
 
       mainElem.replaceChildren();
-      bar.element.append(resetBtn.element);
-      bar.element.append(copyBtn.element);
-      bar.element.append(sort.element);
-      bar.element.append(found.element);
-      bar.element.append(searchElem.element);
-      bar.element.append(viewBtns.element);
+      bar.append(resetBtn, copyBtn, sort, found, searchElem, viewBtns);
       mainElem.append(bar.element);
-      filtersProductsWrapper.element.append(filters.element, productList.element);
+      filtersProductsWrapper.append(filters, productList);
       mainElem.append(filtersProductsWrapper.element);
     },
   },
@@ -231,7 +238,7 @@ new Router([
   },
 ]);
 
-function minMaxValuesFromData(data: IProduct[], prop: keyof Pick<IProduct, 'price' | 'stock'>) {
+function minMaxValuesFromData(data: IProduct[], prop: SearchKeys.price | SearchKeys.stock) {
   const arr = data.map((item) => item[prop]);
   const res = [Math.min(...arr), Math.max(...arr)];
   return res;
@@ -241,7 +248,7 @@ function countItemsForSpan(
   currentData: IProduct[],
   allData: IProduct[],
   filterDataList: string[],
-  productProp: keyof Pick<IProduct, 'category' | 'brand'>
+  productProp: SearchKeys.category | SearchKeys.brand
 ) {
   const res: number[][] = [];
   filterDataList.forEach((prop) => {
@@ -258,11 +265,11 @@ function updateFiltersValues(
   isCallingInPrice = false,
   isCallingInStock = false
 ) {
-  const countItemsCategory = countItemsForSpan(currentProducts, allProducts, [...categoryList], 'category');
-  const countItemsBrand = countItemsForSpan(currentProducts, allProducts, [...brandList], 'brand');
+  const countItemsCategory = countItemsForSpan(currentProducts, allProducts, [...categoryList], SearchKeys.category);
+  const countItemsBrand = countItemsForSpan(currentProducts, allProducts, [...brandList], SearchKeys.brand);
 
-  const minMaxPrice = minMaxValuesFromData(currentProducts, 'price');
-  const minMaxStock = minMaxValuesFromData(currentProducts, 'stock');
+  const minMaxPrice = minMaxValuesFromData(currentProducts, SearchKeys.price);
+  const minMaxStock = minMaxValuesFromData(currentProducts, SearchKeys.stock);
 
   filters.checkBoxFilters[0].updateList(countItemsCategory);
   filters.checkBoxFilters[1].updateList(countItemsBrand);

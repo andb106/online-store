@@ -45,3 +45,15 @@ export type SliderOptions = {
   max: number;
   callback: SliderCallBack;
 };
+
+export enum SearchKeys {
+  category = 'category',
+  brand = 'brand',
+  price = 'price',
+  stock = 'stock',
+  sortParam = 'sortParam',
+  searchValue = 'searchValue',
+  viewMode = 'searchValue',
+}
+
+// type TestType = Record<SearchKeys.brand | SearchKeys.category, string[]>;

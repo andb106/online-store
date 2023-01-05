@@ -1,0 +1,32 @@
+.view-buttons {
+  display: flex;
+}
+
+.view-buttons__btn {
+  cursor: pointer;
+  background-size: contain;
+  width: 20px;
+  height: 20px;
+  filter: invert(100%);
+
+  &:hover {
+    scale: 1.05;
+  }
+
+  &.view-tile {
+    background-image: url("../../img/tile.svg");
+  }
+
+  &.view-list {
+    background-image: url("../../img/list.svg");
+  }
+
+  &.active-mode {
+    filter: invert(77%) sepia(54%) saturate(3728%) hue-rotate(70deg);
+  }
+}
+
+.view-buttons__btn:first-child {
+  margin-right: 10px;
+}
+

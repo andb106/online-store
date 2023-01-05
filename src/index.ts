@@ -13,6 +13,8 @@ import { Sort } from './components/sort/sort';
 import { Search } from './components/search/search';
 import { Found } from './components/found/found';
 import { ResetBtn } from './components/resetBtn/resetBtn';
+import { ViewButtons } from './components/viewButtons/viewButtons';
+import { CopyBtn } from './components/copyBtn/copyBtn';
 
 const state: IState = {
   filters: {
@@ -24,6 +26,7 @@ const state: IState = {
   sortParam: 0,
   searchValue: '',
   products: [],
+  viewMode: 'tile',
 };
 
 const data = dataJson;
@@ -71,7 +74,12 @@ const filterData = (data: IProduct[], state: IState) => {
   return res;
 };
 
-const productList = new ProductList(data.products);
+const productList = new ProductList(data.products, (id) => {
+  mainElem.innerHTML = '';
+  mainElem.append(new ProductPage(data.products[id - 1]).element);
+  history.pushState(null, '', `/product/${id}`);
+});
+
 const filters = new Filters(
   [...categoryList],
   countItemsCategoryInitial,
@@ -82,11 +90,13 @@ const filters = new Filters(
   (values) => {
     state.filters.price = [+values[0], +values[1]];
     searchFilterSortUpdateProducts(data.products, state, true, false);
+    setViewMode(state.viewMode);
     changeUrl('price', state);
   },
   (values) => {
     state.filters.stock = [+values[0], +values[1]];
     searchFilterSortUpdateProducts(data.products, state, false, true);
+    setViewMode(state.viewMode);
     changeUrl('stock', state);
   }
 );
@@ -104,6 +114,7 @@ filters.element.addEventListener('click', (e) => {
       changeUrl(filterType, state);
     }
     searchFilterSortUpdateProducts(data.products, state, false, false);
+    setViewMode(state.viewMode);
   }
 });
 
@@ -124,6 +135,7 @@ const searchElem = new Search((value) => {
   const searchValue = value;
   state.searchValue = searchValue;
   searchFilterSortUpdateProducts(data.products, state, false, false);
+  setViewMode(state.viewMode);
   changeUrl('searchValue', state);
 });
 
@@ -131,6 +143,14 @@ const found = new Found();
 const resetBtn = new ResetBtn(() => {
   resetFilters();
 });
+
+const viewBtns = new ViewButtons((value) => {
+  state.viewMode = value;
+  changeUrl('viewMode', state);
+  setViewMode(value);
+});
+
+const copyBtn = new CopyBtn();
 
 new Router([
   {
@@ -144,6 +164,7 @@ new Router([
     path: '/',
     view: (params) => {
       resetFilters();
+      setViewMode(state.viewMode);
 
       if (params.urlSearch) {
         const test2 = new URLSearchParams(params.urlSearch);
@@ -165,8 +186,13 @@ new Router([
             state.sortParam = +param[1];
             sort.selectElem.selectedIndex = +param[1];
           }
+          if (key === 'viewMode') {
+            state.viewMode = param[1];
+            viewBtns.updateActiveBtn(param[1]);
+          }
         }
         searchFilterSortUpdateProducts(data.products, state, false, false);
+        setViewMode(state.viewMode);
         filters.checkBoxFilters.forEach((item) =>
           item.updateChecked([...state.filters.brand, ...state.filters.category])
         );
@@ -174,9 +200,11 @@ new Router([
 
       mainElem.replaceChildren();
       bar.element.append(resetBtn.element);
+      bar.element.append(copyBtn.element);
       bar.element.append(sort.element);
       bar.element.append(found.element);
       bar.element.append(searchElem.element);
+      bar.element.append(viewBtns.element);
       mainElem.append(bar.element);
       filtersProductsWrapper.element.append(filters.element, productList.element);
       mainElem.append(filtersProductsWrapper.element);
@@ -333,4 +361,17 @@ function changeUrl(filterName: string, state: IState) {
 
 function isObjKey<T extends object>(key: PropertyKey, obj: T): key is keyof T {
   return key in obj;
+}
+
+function setViewMode(viewMode: string) {
+  switch (viewMode) {
+    case 'list':
+      productList.element.classList.add('view-line');
+      [...productList.element.children].forEach((item) => item.classList.add('view-line'));
+      break;
+
+    case 'tile':
+      productList.element.classList.remove('view-line');
+      [...productList.element.children].forEach((item) => item.classList.remove('view-line'));
+  }
 }

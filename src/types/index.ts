@@ -27,6 +27,7 @@ export interface IState {
   sortParam: number;
   searchValue: string;
   products: IProduct[];
+  viewMode: string;
 }
 
 export interface IFilters {

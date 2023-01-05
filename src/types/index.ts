@@ -53,7 +53,7 @@ export enum SearchKeys {
   stock = 'stock',
   sortParam = 'sortParam',
   searchValue = 'searchValue',
-  viewMode = 'searchValue',
+  viewMode = 'viewMode',
 }
 
 // type TestType = Record<SearchKeys.brand | SearchKeys.category, string[]>;

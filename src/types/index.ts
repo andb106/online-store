@@ -23,18 +23,18 @@ export interface ICartItem {
 }
 
 export interface IState {
+  [SearchKeys.sortParam]: number;
+  [SearchKeys.searchValue]: string;
+  [SearchKeys.viewMode]: string;
   filters: IFilters;
-  sortParam: number;
-  searchValue: string;
   products: IProduct[];
-  viewMode: string;
 }
 
 export interface IFilters {
-  category: string[];
-  brand: string[];
-  price: number[];
-  stock: number[];
+  [SearchKeys.category]: string[];
+  [SearchKeys.brand]: string[];
+  [SearchKeys.price]: number[];
+  [SearchKeys.stock]: number[];
 }
 
 export type SliderCallBack = (values: (string | number)[]) => void;
@@ -55,5 +55,3 @@ export enum SearchKeys {
   searchValue = 'searchValue',
   viewMode = 'viewMode',
 }
-
-// type TestType = Record<SearchKeys.brand | SearchKeys.category, string[]>;

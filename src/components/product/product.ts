@@ -1,5 +1,6 @@
 import { IProduct } from '../../types/index';
 import { BaseComponent } from '../baseComponent';
+import { checkProductInCart, addToCart, removeFromCart } from '../../utils/db';
 import './product.scss';
 
 export class Product extends BaseComponent {
@@ -21,7 +22,17 @@ export class Product extends BaseComponent {
     const btns = new BaseComponent('div', 'product__buttons');
 
     const btnToCart = new BaseComponent('div', 'product__btn');
-    btnToCart.element.textContent = 'Add to cart';
+    btnToCart.element.textContent = checkProductInCart(this.id) ? 'Drop from cart' : 'Add to cart';
+
+    btnToCart.element.onclick = () => {
+      if (!checkProductInCart(this.id)) {
+        addToCart(this.id, 1, data.price);
+        btnToCart.element.textContent = 'Drop from cart';
+      } else {
+        removeFromCart(this.id, data.price);
+        btnToCart.element.textContent = 'Add to cart';
+      }
+    };
 
     const btnDetails = new BaseComponent('div', 'product__btn');
     btnDetails.element.textContent = 'Details';
@@ -32,9 +43,5 @@ export class Product extends BaseComponent {
     };
 
     this.element.append(btns.element);
-    // if (cbClick) this.element.onclick = cbClick.bind(this.element, this.id);
-  }
-  toggleView() {
-    this.element.children[2].classList.toggle('hidden');
   }
 }

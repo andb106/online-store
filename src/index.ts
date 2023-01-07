@@ -1,3 +1,4 @@
+import { CartPage } from './components/cart/cart-page';
 //import { Product } from './components/product/product';
 import { ProductPage } from './components/product-page/product-page';
 import './styles-global.scss';
@@ -13,6 +14,7 @@ import { Sort } from './components/sort/sort';
 import { Search } from './components/search/search';
 import { Found } from './components/found/found';
 import { ResetBtn } from './components/resetBtn/resetBtn';
+import { getCart } from './utils/db';
 
 const state: IState = {
   filters: {
@@ -150,8 +152,7 @@ new Router([
   {
     path: '/cart',
     view: () => {
-      mainElem.innerHTML = '';
-      mainElem.innerHTML = 'cart page';
+      mainElem.append(new CartPage(data.products, getCart()).element);
     },
   },
   {

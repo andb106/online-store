@@ -44,3 +44,8 @@ export type SliderOptions = {
   max: number;
   callback: SliderCallBack;
 };
+
+export interface IPromocode {
+  title: string,
+  percentage: number
+}

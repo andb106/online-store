@@ -16,6 +16,7 @@ import { ResetBtn } from './components/resetBtn/resetBtn';
 import { ViewButtons } from './components/viewButtons/viewButtons';
 import { CopyBtn } from './components/copyBtn/copyBtn';
 import { SearchKeys } from './types';
+import { Header } from './components/header/header';
 
 const state: IState = {
   filters: {
@@ -53,6 +54,13 @@ const mainElem: HTMLElement | null = document.querySelector('.main');
 if (!mainElem) {
   throw new Error('not found main element');
 }
+
+const header = new Header();
+mainElem.before(header.element);
+
+window.addEventListener('storage', () => {
+  header.updateContent();
+});
 
 const filterData = (data: IProduct[], state: IState) => {
   let res = data;

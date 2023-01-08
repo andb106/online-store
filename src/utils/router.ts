@@ -19,8 +19,9 @@ export default class Router {
     document.body.addEventListener('click', (e) => {
       const navLink = e.target as HTMLElement;
       if (navLink && navLink.matches('[router-link]')) {
-        e.preventDefault();
-        this.navigateTo(navLink.getAttribute('href'));
+        // e.preventDefault();
+        // this.navigateTo(navLink.getAttribute('href'));
+        this.navigateTo(navLink.getAttribute('router-link'));
       }
     });
     this.router();

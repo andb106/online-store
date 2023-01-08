@@ -14,6 +14,8 @@ export function addToCart(id: number, num: number, price: number) {
   localStorage.setItem('uliara_sum', sum.toString());
   const numCart: number = Number(localStorage.getItem('uliara_num') || '0') + num;
   localStorage.setItem('uliara_num', numCart.toString());
+
+  window.dispatchEvent(new Event('storage'));
 }
 
 export function checkProductInCart(id: number): boolean {
@@ -44,4 +46,6 @@ export function removeFromCart(id: number, price: number) {
   localStorage.setItem('uliara_cart', JSON.stringify(newCartArr));
   localStorage.setItem('uliara_sum', newSum.toString());
   localStorage.setItem('uliara_num', newNumCart.toString());
+
+  window.dispatchEvent(new Event('storage'));
 }

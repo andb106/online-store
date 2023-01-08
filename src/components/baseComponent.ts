@@ -6,6 +6,13 @@ export class BaseComponent {
     this.element.className = style;
   }
 
+  getSpecifiedChildren(selectors: string[]) {
+    return selectors.map((x) => this.element.querySelector(x) as HTMLElement);
+  }
+
+  getSpecifiedChild(selector: string) {
+    return this.element.querySelector(selector) as HTMLElement;
+  }
   hasClass(token: string) {
     return this.element.classList.contains(token);
   }

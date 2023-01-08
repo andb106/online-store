@@ -1,26 +1,79 @@
+import { IProduct } from './../types/index';
 import { ICartItem } from '../types';
+import { CartPage } from '../components/cart/cart-page';
 
-export function addToCart(id: number, num: number, price: number) {
-  const cartArr: ICartItem[] = JSON.parse(localStorage.getItem('uliara_cart') || '[]');
-  const existedIdx: number = cartArr.findIndex((x) => x.productId === id);
-  existedIdx !== -1
-    ? (cartArr[existedIdx].number += 1)
-    : cartArr.push({
-        productId: id,
-        number: num,
-      });
-  localStorage.setItem('uliara_cart', JSON.stringify(cartArr));
-  const sum: number = Number(localStorage.getItem('uliara_sum') || '0') + num * price;
-  localStorage.setItem('uliara_sum', sum.toString());
-  const numCart: number = Number(localStorage.getItem('uliara_num') || '0') + num;
-  localStorage.setItem('uliara_num', numCart.toString());
+export const enum CartData {
+  cart = 'uliara_cart',
+  totalPrice = 'uliara_sum',
+  totalCount = 'uliara_num',
+}
 
+export function getCart(): ICartItem[] {
+  return JSON.parse(localStorage.getItem(CartData.cart) || '[]');
+}
+
+function setCartData(type: CartData, value: unknown) {
+  localStorage.setItem(type, JSON.stringify(value));
   window.dispatchEvent(new Event('storage'));
 }
 
-export function checkProductInCart(id: number): boolean {
-  const cartArr: ICartItem[] = JSON.parse(localStorage.getItem('uliara_cart') || '[]');
-  const existedIdx: number = cartArr.findIndex((x) => x.productId === id);
+export function getCartNumberData(type: CartData, defaultValue = '0') {
+  return Number(localStorage.getItem(type) || defaultValue);
+}
+
+export function addToCart(productId: number, number: number, price: number) {
+  const cartArr: ICartItem[] = getCart();
+  const existedIdx: number = cartArr.findIndex((x) => x.productId === productId);
+
+  existedIdx !== -1
+    ? (cartArr[existedIdx].number += 1)
+    : cartArr.push({
+        productId,
+        number,
+      });
+
+  const totalPrice: number = getCartNumberData(CartData.totalPrice) + number * price;
+  const totalCount: number = getCartNumberData(CartData.totalCount) + number;
+
+  setCartData(CartData.totalPrice, totalPrice);
+  setCartData(CartData.totalCount, totalCount);
+  setCartData(CartData.cart, cartArr);
+}
+
+export function removeOneFromCart(productId: number, newNum: number, price: number) {
+  const cartArr: ICartItem[] = getCart();
+  const existedIdx: number = cartArr.findIndex((x) => x.productId === productId);
+  cartArr[existedIdx].number = newNum;
+
+  const sum: number = getCartNumberData(CartData.totalPrice) - price;
+  const numCart: number = getCartNumberData(CartData.totalCount) - 1;
+
+  setCartData(CartData.cart, cartArr);
+  setCartData(CartData.totalPrice, sum);
+  setCartData(CartData.totalCount, numCart);
+}
+
+export function removeItemFromCart(productId: number, number: number, price: number, products: IProduct[]) {
+  let cartArr: ICartItem[] = getCart();
+  cartArr = cartArr.filter((x) => x.productId !== productId);
+
+  const sum: number = getCartNumberData(CartData.totalPrice) - number * price;
+  const numCart: number = getCartNumberData(CartData.totalCount) - number;
+
+  setCartData(CartData.cart, cartArr);
+  setCartData(CartData.totalPrice, sum);
+  setCartData(CartData.totalCount, numCart);
+
+  const mainElem: HTMLElement | null = document.querySelector('.main');
+  if (mainElem !== null) {
+    mainElem.innerHTML = '';
+    mainElem.append(new CartPage(products, getCart()).element);
+  }
+}
+
+export function checkProductInCart(productId: number): boolean {
+  const cartArr: ICartItem[] = getCart();
+  const existedIdx: number = cartArr.findIndex((x) => x.productId === productId);
   if (existedIdx === -1) {
     return false;
   }
@@ -32,20 +85,36 @@ export function changeCartBtn(btnCart: HTMLElement) {
   btnCart.classList.add('btn--disabled');
 }
 
-export function removeFromCart(id: number, price: number) {
-  const cartArr: ICartItem[] = JSON.parse(localStorage.getItem('uliara_cart') || '[]');
+export function addMoreToCart(data: IProduct, num: number): boolean {
+  if (data.stock > num) {
+    addToCart(data.id, 1, data.price);
+    return true;
+  }
+  return false;
+}
+
+export function removeFromCart(data: IProduct, num: number, products: IProduct[]): boolean {
+  if (num - 1 === 0) {
+    removeItemFromCart(data.id, num, data.price, products);
+    return false;
+  } else {
+    removeOneFromCart(data.id, num - 1, data.price);
+    return true;
+  }
+}
+
+export function removeFromCartOnMainPage(id: number, price: number) {
+  const cartArr: ICartItem[] = getCart();
   const existedIdx: number = cartArr.findIndex((x) => x.productId === id);
 
   const numCurrentProduct = cartArr[existedIdx].number;
   const sumCurrentProduct = numCurrentProduct * price;
 
-  const newSum = Number(localStorage.getItem('uliara_sum') || '0') - sumCurrentProduct;
-  const newNumCart = Number(localStorage.getItem('uliara_num') || '0') - numCurrentProduct;
+  const newSum = getCartNumberData(CartData.totalPrice) - sumCurrentProduct;
+  const newNumCart = getCartNumberData(CartData.totalCount) - numCurrentProduct;
   const newCartArr = cartArr.filter((x) => x.productId !== id);
 
-  localStorage.setItem('uliara_cart', JSON.stringify(newCartArr));
-  localStorage.setItem('uliara_sum', newSum.toString());
-  localStorage.setItem('uliara_num', newNumCart.toString());
-
-  window.dispatchEvent(new Event('storage'));
+  setCartData(CartData.cart, newCartArr);
+  setCartData(CartData.totalPrice, newSum);
+  setCartData(CartData.totalCount, newNumCart);
 }

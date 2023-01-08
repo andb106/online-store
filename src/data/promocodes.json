@@ -1,0 +1,24 @@
+{
+    "promocodes": [
+        {
+            "title": "RSSchool",
+            "percentage": 20
+        },
+        {
+            "title": "JS",
+            "percentage": 30
+        },
+        {
+            "title": "TS",
+            "percentage": 10
+        },
+        {
+            "title": "HTML",
+            "percentage": 15
+        },
+        {
+            "title": "CSS",
+            "percentage": 20
+        }
+    ]
+}

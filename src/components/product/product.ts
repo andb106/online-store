@@ -1,6 +1,6 @@
 import { IProduct } from '../../types/index';
 import { BaseComponent } from '../baseComponent';
-import { checkProductInCart, addToCart, removeFromCart } from '../../utils/db';
+import { checkProductInCart, addToCart, removeFromCartOnMainPage } from '../../utils/db';
 import './product.scss';
 
 export class Product extends BaseComponent {
@@ -29,7 +29,7 @@ export class Product extends BaseComponent {
         addToCart(this.id, 1, data.price);
         btnToCart.element.textContent = 'Drop from cart';
       } else {
-        removeFromCart(this.id, data.price);
+        removeFromCartOnMainPage(this.id, data.price);
         btnToCart.element.textContent = 'Add to cart';
       }
     };

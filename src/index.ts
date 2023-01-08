@@ -1,3 +1,4 @@
+import { CartPage } from './components/cart/cart-page';
 //import { Product } from './components/product/product';
 import { ProductPage } from './components/product-page/product-page';
 import './styles-global.scss';
@@ -13,6 +14,7 @@ import { Sort } from './components/sort/sort';
 import { Search } from './components/search/search';
 import { Found } from './components/found/found';
 import { ResetBtn } from './components/resetBtn/resetBtn';
+import { getCart } from './utils/db';
 import { ViewButtons } from './components/viewButtons/viewButtons';
 import { CopyBtn } from './components/copyBtn/copyBtn';
 import { SearchKeys } from './types';
@@ -228,8 +230,8 @@ new Router([
   {
     path: '/cart',
     view: () => {
-      mainElem.innerHTML = '';
-      mainElem.innerHTML = 'cart page';
+      mainElem.replaceChildren();
+      mainElem.append(new CartPage(data.products, getCart()).element);
     },
   },
   {

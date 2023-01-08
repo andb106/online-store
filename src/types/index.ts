@@ -46,6 +46,11 @@ export type SliderOptions = {
   callback: SliderCallBack;
 };
 
+export interface IPromocode {
+  title: string;
+  percentage: number;
+}
+
 export enum SearchKeys {
   category = 'category',
   brand = 'brand',

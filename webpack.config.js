@@ -4,6 +4,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const EslintPlugin = require('eslint-webpack-plugin');
+const { NetlifyPlugin } = require('netlify-webpack-plugin');
 
 const isProduction = process.env.NODE_ENV == 'production';
 
@@ -34,6 +35,15 @@ const config = {
       filename: 'index.html',
     }),
     new EslintPlugin({ extensions: 'ts' }),
+    new NetlifyPlugin({
+      redirects: [
+        {
+          from: '/*',
+          to: '/index.html',
+          status: 200,
+        },
+      ],
+    }),
     // Add your plugins here
     // Learn more about plugins from https://webpack.js.org/configuration/plugins/
   ],

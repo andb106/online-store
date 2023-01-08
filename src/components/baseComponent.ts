@@ -13,4 +13,19 @@ export class BaseComponent {
   getSpecifiedChild(selector: string) {
     return this.element.querySelector(selector) as HTMLElement;
   }
+  hasClass(token: string) {
+    return this.element.classList.contains(token);
+  }
+
+  addClass(...tokens: string[]) {
+    this.element.classList.add(...tokens);
+  }
+
+  removeClass(...tokens: string[]) {
+    this.element.classList.remove(...tokens);
+  }
+
+  append(...components: BaseComponent[]) {
+    this.element.append(...components.map((el) => el.element));
+  }
 }

@@ -100,3 +100,19 @@ export function removeFromCart(data: IProduct, num: number, products: IProduct[]
     return true;
   }
 }
+
+export function removeFromCartOnMainPage(id: number, price: number) {
+  const cartArr: ICartItem[] = getCart();
+  const existedIdx: number = cartArr.findIndex((x) => x.productId === id);
+
+  const numCurrentProduct = cartArr[existedIdx].number;
+  const sumCurrentProduct = numCurrentProduct * price;
+
+  const newSum = getCartNumberData(CartData.totalPrice) - sumCurrentProduct;
+  const newNumCart = getCartNumberData(CartData.totalCount) - numCurrentProduct;
+  const newCartArr = cartArr.filter((x) => x.productId !== id);
+
+  setCartData(CartData.cart, newCartArr);
+  setCartData(CartData.totalPrice, newSum);
+  setCartData(CartData.totalCount, newNumCart);
+}

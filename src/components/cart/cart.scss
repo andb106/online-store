@@ -26,6 +26,14 @@
         display: block;
         margin: 0 auto;
     }
+
+    &__img {
+        display: block;
+        width: 80px;
+        height: 80px;
+
+        margin-left: 30px;
+    }
 }
 
 .cart {

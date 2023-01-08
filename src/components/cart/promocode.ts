@@ -1,11 +1,10 @@
 import { IPromocode } from './../../types/index';
 import { BaseComponent } from './../baseComponent';
 import '../cart/cart.scss';
-import { deletePromocode } from '../../utils/db';
 
 export class Promocode extends BaseComponent {
   promocode: IPromocode;
-  constructor(promocode: IPromocode) {
+  constructor(promocode: IPromocode, deletePromocode: (promocode: IPromocode) => void) {
     super('div', 'promocode');
     this.promocode = promocode;
     this.element.innerHTML = `
@@ -14,9 +13,11 @@ export class Promocode extends BaseComponent {
       <button class="btn promocode__delete">Delete</button>
     `;
     const deleteBtn: HTMLElement | null = this.element.querySelector('.promocode__delete');
+
     if (deleteBtn !== null) {
       deleteBtn.onclick = () => {
-        deletePromocode(promocode, this.element);
+        this.element.remove();
+        deletePromocode(promocode);
       };
     }
   }

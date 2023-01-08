@@ -1,42 +1,67 @@
-import { IProduct, IPromocode } from './../types/index';
+import { IProduct } from './../types/index';
 import { ICartItem } from '../types';
 import { CartPage } from '../components/cart/cart-page';
 
-export function addToCart(id: number, num: number, price: number) {
+export const enum CartData {
+  cart = 'uliara_cart',
+  totalPrice = 'uliara_sum',
+  totalCount = 'uliara_num',
+}
+
+export function getCart(): ICartItem[] {
+  return JSON.parse(localStorage.getItem(CartData.cart) || '[]');
+}
+
+function setCartData(type: CartData, value: unknown) {
+  localStorage.setItem(type, JSON.stringify(value));
+}
+
+export function getCartNumberData(type: CartData, defaultValue = '0') {
+  return Number(localStorage.getItem(type) || defaultValue);
+}
+
+export function addToCart(productId: number, number: number, price: number) {
   const cartArr: ICartItem[] = getCart();
-  const existedIdx: number = cartArr.findIndex((x) => x.productId === id);
+  const existedIdx: number = cartArr.findIndex((x) => x.productId === productId);
+
   existedIdx !== -1
     ? (cartArr[existedIdx].number += 1)
     : cartArr.push({
-        productId: id,
-        number: num,
+        productId,
+        number,
       });
-  localStorage.setItem('uliara_cart', JSON.stringify(cartArr));
-  const sum: number = Number(localStorage.getItem('uliara_sum') || '0') + num * price;
-  localStorage.setItem('uliara_sum', sum.toString());
-  const numCart: number = Number(localStorage.getItem('uliara_num') || '0') + num;
-  localStorage.setItem('uliara_num', numCart.toString());
+  const totalPrice: number = getCartNumberData(CartData.totalPrice) + number * price;
+  const totalCount: number = getCartNumberData(CartData.totalCount) + number;
+
+  setCartData(CartData.totalPrice, totalPrice);
+  setCartData(CartData.totalCount, totalCount);
+  setCartData(CartData.cart, cartArr);
 }
 
-export function removeOneFromCart(id: number, newNum: number, price: number) {
+export function removeOneFromCart(productId: number, newNum: number, price: number) {
   const cartArr: ICartItem[] = getCart();
-  const existedIdx: number = cartArr.findIndex((x) => x.productId === id);
+  const existedIdx: number = cartArr.findIndex((x) => x.productId === productId);
   cartArr[existedIdx].number = newNum;
-  localStorage.setItem('uliara_cart', JSON.stringify(cartArr));
-  const sum: number = Number(localStorage.getItem('uliara_sum') || '0') - price;
-  localStorage.setItem('uliara_sum', sum.toString());
-  const numCart: number = Number(localStorage.getItem('uliara_num') || '0') - 1;
-  localStorage.setItem('uliara_num', numCart.toString());
+
+  const sum: number = getCartNumberData(CartData.totalPrice) - price;
+  const numCart: number = getCartNumberData(CartData.totalCount) - 1;
+
+  setCartData(CartData.cart, cartArr);
+  setCartData(CartData.totalPrice, sum);
+  setCartData(CartData.totalCount, numCart);
 }
 
-export function removeItemFromCart(id: number, num: number, price: number, products: IProduct[]) {
+export function removeItemFromCart(productId: number, number: number, price: number, products: IProduct[]) {
   let cartArr: ICartItem[] = getCart();
-  cartArr = cartArr.filter((x) => x.productId !== id);
-  localStorage.setItem('uliara_cart', JSON.stringify(cartArr));
-  const sum: number = Number(localStorage.getItem('uliara_sum') || '0') - num * price;
-  localStorage.setItem('uliara_sum', sum.toString());
-  const numCart: number = Number(localStorage.getItem('uliara_num') || '0') - num;
-  localStorage.setItem('uliara_num', numCart.toString());
+  cartArr = cartArr.filter((x) => x.productId !== productId);
+
+  const sum: number = getCartNumberData(CartData.totalPrice) - number * price;
+  const numCart: number = getCartNumberData(CartData.totalCount) - number;
+
+  setCartData(CartData.cart, cartArr);
+  setCartData(CartData.totalPrice, sum);
+  setCartData(CartData.totalCount, numCart);
+
   const mainElem: HTMLElement | null = document.querySelector('.main');
   if (mainElem !== null) {
     mainElem.innerHTML = '';
@@ -44,24 +69,9 @@ export function removeItemFromCart(id: number, num: number, price: number, produ
   }
 }
 
-export function updateNumsInCart(cartNumTotal?: Element | null, cartSumTotal?: Element | null): void {
-  const sum: string = localStorage.getItem('uliara_sum') || '0';
-  const numCart: string = localStorage.getItem('uliara_num') || '0';
-  if (cartNumTotal === undefined) {
-    cartNumTotal = document.querySelector('#cartNumTotal');
-  }
-  if (cartSumTotal === undefined) {
-    cartSumTotal = document.querySelector('#cartSumTotal');
-  }
-  if (cartNumTotal !== null && cartSumTotal !== null) {
-    cartNumTotal.innerHTML = numCart;
-    cartSumTotal.innerHTML = sum;
-  }
-}
-
-export function checkProductInCart(id: number): boolean {
+export function checkProductInCart(productId: number): boolean {
   const cartArr: ICartItem[] = getCart();
-  const existedIdx: number = cartArr.findIndex((x) => x.productId === id);
+  const existedIdx: number = cartArr.findIndex((x) => x.productId === productId);
   if (existedIdx === -1) {
     return false;
   }
@@ -73,14 +83,9 @@ export function changeCartBtn(btnCart: HTMLElement) {
   btnCart.classList.add('btn--disabled');
 }
 
-export function getCart(): ICartItem[] {
-  return JSON.parse(localStorage.getItem('uliara_cart') || '[]');
-}
-
 export function addMoreToCart(data: IProduct, num: number): boolean {
   if (data.stock > num) {
     addToCart(data.id, 1, data.price);
-    updateNumsInCart();
     return true;
   }
   return false;
@@ -89,29 +94,9 @@ export function addMoreToCart(data: IProduct, num: number): boolean {
 export function removeFromCart(data: IProduct, num: number, products: IProduct[]): boolean {
   if (num - 1 === 0) {
     removeItemFromCart(data.id, num, data.price, products);
-    updateNumsInCart();
     return false;
   } else {
     removeOneFromCart(data.id, num - 1, data.price);
-    updateNumsInCart();
     return true;
-  }
-}
-
-export function deletePromocode(promocode: IPromocode, element: HTMLElement) {
-  element.remove();
-  const cartSumTotal: HTMLElement | null = document.querySelector('#cartSumTotal');
-  const cartNewSumTotal: HTMLElement | null = document.querySelector('.cart__new-sum');
-  const promoBlock: HTMLElement[] | null = Array.from(document.querySelectorAll('.promocode'));
-  const promoAppliedTitle: HTMLElement | null = document.querySelector('.cart__title-promo');
-  if (promoBlock !== null && promoBlock.length !== 0 && cartNewSumTotal !== null) {
-    promoAppliedTitle?.classList.remove('cart__title-promo--visible');
-    const missedPromo: number = Math.floor(Number(cartSumTotal?.innerHTML) / 100) * promocode.percentage;
-    const newSum: number = Number(cartNewSumTotal.innerHTML) + missedPromo;
-    cartNewSumTotal.innerHTML = newSum.toString();
-  } else if (promoBlock.length === 0) {
-    promoAppliedTitle?.classList.remove('cart__title-promo--visible');
-    cartNewSumTotal?.classList.remove('cart__new-sum--visible');
-    cartSumTotal?.classList.remove('cart__sum--overlined');
   }
 }

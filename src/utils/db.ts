@@ -14,6 +14,7 @@ export function getCart(): ICartItem[] {
 
 function setCartData(type: CartData, value: unknown) {
   localStorage.setItem(type, JSON.stringify(value));
+  window.dispatchEvent(new Event('storage'));
 }
 
 export function getCartNumberData(type: CartData, defaultValue = '0') {
@@ -30,6 +31,7 @@ export function addToCart(productId: number, number: number, price: number) {
         productId,
         number,
       });
+
   const totalPrice: number = getCartNumberData(CartData.totalPrice) + number * price;
   const totalCount: number = getCartNumberData(CartData.totalCount) + number;
 

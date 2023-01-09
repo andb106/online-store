@@ -64,10 +64,14 @@ export function removeItemFromCart(productId: number, number: number, price: num
   setCartData(CartData.totalPrice, sum);
   setCartData(CartData.totalCount, numCart);
 
+  openCart(false, products);
+}
+
+export function openCart(modal: boolean, products: IProduct[]) {
   const mainElem: HTMLElement | null = document.querySelector('.main');
   if (mainElem !== null) {
     mainElem.innerHTML = '';
-    mainElem.append(new CartPage(products, getCart()).element);
+    mainElem.append(new CartPage(products, getCart(), modal).element);
   }
 }
 

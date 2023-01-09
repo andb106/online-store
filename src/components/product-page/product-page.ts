@@ -1,10 +1,10 @@
 import { IProduct } from '../../types/index';
 import { BaseComponent } from '../baseComponent';
-import { addToCart, checkProductInCart, changeCartBtn } from '../../utils/db';
+import { addToCart, checkProductInCart, changeCartBtn, openCart } from '../../utils/db';
 import './product-page.scss';
 
 export class ProductPage extends BaseComponent {
-  constructor(data: IProduct) {
+  constructor(data: IProduct, products: IProduct[]) {
     super('div', 'item');
     this.element.innerHTML = `
         <p class="item__breadcrumbs">
@@ -61,6 +61,12 @@ export class ProductPage extends BaseComponent {
         changeCartBtn(btnCart);
       }
     }
+
+    const btnOrder: HTMLElement | null = this.element.querySelector('.item__buy');
+    btnOrder?.addEventListener('click', () => {
+      if (!checkProductInCart(data.id)) addToCart(data.id, 1, data.price);
+      openCart(true, products);
+    });
   }
 
   setImageChange(images: HTMLElement[], mainImg: HTMLElement, data: IProduct) {

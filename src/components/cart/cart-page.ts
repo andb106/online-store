@@ -1,3 +1,4 @@
+import { OrderModal } from './order';
 import { Promocode } from './promocode';
 import { CartItem } from './cart-item';
 import { ICartItem, IProduct, IPromocode } from './../../types/index';
@@ -6,7 +7,7 @@ import promocodes from '../../data/promocodes.json';
 import { CartData, getCart, getCartNumberData } from '../../utils/db';
 
 export class CartPage extends BaseComponent {
-  constructor(private products: IProduct[], private cart: ICartItem[]) {
+  constructor(private products: IProduct[], private cart: ICartItem[], private modal: boolean) {
     super('div', 'cart');
     this.element.innerHTML = `
       <h2 class="cart__title">Cart</h2>
@@ -40,14 +41,14 @@ export class CartPage extends BaseComponent {
       <p class="cart__error">error</p>
       <div class="cart__title-promo">Applied promocodes:</div>
       <div class="cart__applied"></div>
-      <button class="btn">Order</button>
+      <button class="btn cart__order">Order</button>
     `;
 
     this.setEventListeners();
   }
 
   setEventListeners() {
-    const [pagesSelect, promoBtn, promoInput, promoBlock, promoAppliedTitle, cartSumTotal, cartNewSumTotal] =
+    const [pagesSelect, promoBtn, promoInput, promoBlock, promoAppliedTitle, cartSumTotal, cartNewSumTotal, btnOrder] =
       this.getSpecifiedChildren([
         '.cart__select',
         '.cart__btn-promo',
@@ -56,6 +57,7 @@ export class CartPage extends BaseComponent {
         '.cart__title-promo',
         '#cartSumTotal',
         '.cart__new-sum',
+        '.cart__order',
       ]);
 
     this.updateNumsInCart();
@@ -89,6 +91,12 @@ export class CartPage extends BaseComponent {
       cartNewSumTotal.innerHTML = Math.floor(oldSum - percent).toString();
       cartNewSumTotal.classList.add('cart__new-sum--visible');
       (promoInput as HTMLInputElement).value = '';
+    });
+
+    if (this.modal) this.element.append(new OrderModal().element);
+
+    btnOrder.addEventListener('click', () => {
+      this.element.append(new OrderModal().element);
     });
   }
 

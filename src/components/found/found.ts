@@ -1,4 +1,5 @@
 import { BaseComponent } from '../baseComponent';
+import './found.scss';
 
 export class Found extends BaseComponent {
   count = 100;

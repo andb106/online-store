@@ -3,7 +3,7 @@ import './copyBtn.scss';
 
 export class CopyBtn extends BaseComponent {
   constructor() {
-    super('button', 'copy-btn');
+    super('button', 'btn copy-btn');
     this.element.textContent = 'Copy link';
     this.element.onclick = () => {
       this.element.textContent = 'Copied !';

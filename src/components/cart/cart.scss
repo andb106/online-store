@@ -19,7 +19,7 @@
     &__calc {
         display: flex;
         flex-direction: column;
-        margin: 0 40px;  
+        margin: 0 40px;
     }
 
     &__number {
@@ -74,7 +74,7 @@
         &:not(:first-child) {
             margin-left: 8px;
         }
-        
+
         display: block;
         height: 35px;
         width: auto;
@@ -179,8 +179,13 @@
         top: 0;
         left: 0;
         margin: 0 auto;
-        width: 50%;
-        height: 50%;
+        width: 38%;
+        opacity: 0.8;
+        border: 1px solid red;
+        padding: 15px;
+        border-radius: 20px;
+        background: #17181c;
+        text-align: center
     }
 
     &__info {

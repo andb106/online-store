@@ -92,7 +92,7 @@ const filterData = (data: IProduct[], state: IState) => {
 
 const productList = new ProductList(data.products, (id) => {
   mainElem.innerHTML = '';
-  mainElem.append(new ProductPage(data.products[id - 1]).element);
+  mainElem.append(new ProductPage(data.products[id - 1], data.products).element);
   history.pushState(null, '', `/product/${id}`);
 });
 
@@ -231,7 +231,7 @@ new Router([
     path: '/cart',
     view: () => {
       mainElem.replaceChildren();
-      mainElem.append(new CartPage(data.products, getCart()).element);
+      mainElem.append(new CartPage(data.products, getCart(), false).element);
     },
   },
   {
@@ -240,7 +240,7 @@ new Router([
       const len = data.products.length;
       mainElem.innerHTML = '';
       if (+params.id - 1 >= 0 && +params.id - 1 < len) {
-        mainElem.append(new ProductPage(data.products[+params.id - 1]).element);
+        mainElem.append(new ProductPage(data.products[+params.id - 1], data.products).element);
       } else {
         mainElem.innerHTML = `Product with id ${params.id} not found`;
       }

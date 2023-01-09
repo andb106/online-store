@@ -1,10 +1,10 @@
 import { IProduct } from '../../types/index';
 import { BaseComponent } from '../baseComponent';
-import { addToCart, checkProductInCart, changeCartBtn } from '../../utils/db';
+import { addToCart, checkProductInCart, changeCartBtn, openCart } from '../../utils/db';
 import './product-page.scss';
 
 export class ProductPage extends BaseComponent {
-  constructor(data: IProduct) {
+  constructor(data: IProduct, products: IProduct[]) {
     super('div', 'item');
     this.element.innerHTML = `
         <p class="item__breadcrumbs">
@@ -22,10 +22,10 @@ export class ProductPage extends BaseComponent {
           <div class="item__text">
             <div class="item__info">
               <h3 class="item__title">${data.title}</h3>
-              <p class="item__info-one">Категория: ${data.category}</p>
-              <p class="item__info-one">Бренд: ${data.brand}</p>
-              <p class="item__info-one">На складе: ${data.stock} штук</p>
-              <p class="item__info-one">Рейтинг: ${data.rating}/5</p>
+              <p class="item__info-one">Category: ${data.category}</p>
+              <p class="item__info-one">Brand: ${data.brand}</p>
+              <p class="item__info-one">${data.stock} pieces left in stock</p>
+              <p class="item__info-one">Rating: ${data.rating}/5</p>
               <div class="item__sum">
                 <span class="item__price">${data.price}$</span>
                 <span class="item__discount">${data.discountPercentage}%</span>
@@ -35,8 +35,8 @@ export class ProductPage extends BaseComponent {
           </div>
         </div>
         <div class="item__controls">
-          <button class="btn item__cart">В КОРЗИНУ</button>
-          <button class="btn item__buy">КУПИТЬ</button>
+          <button class="btn item__cart">Add to cart</button>
+          <button class="btn item__buy">Buy</button>
         </div>
         <div class="item__modal">
           <img src="${data.images[0]}" alt="${data.title}" id="itemModalImg" />
@@ -61,6 +61,12 @@ export class ProductPage extends BaseComponent {
         changeCartBtn(btnCart);
       }
     }
+
+    const btnOrder: HTMLElement | null = this.element.querySelector('.item__buy');
+    btnOrder?.addEventListener('click', () => {
+      if (!checkProductInCart(data.id)) addToCart(data.id, 1, data.price);
+      openCart(true, products);
+    });
   }
 
   setImageChange(images: HTMLElement[], mainImg: HTMLElement, data: IProduct) {

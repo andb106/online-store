@@ -64,10 +64,14 @@ export function removeItemFromCart(productId: number, number: number, price: num
   setCartData(CartData.totalPrice, sum);
   setCartData(CartData.totalCount, numCart);
 
+  openCart(false, products);
+}
+
+export function openCart(modal: boolean, products: IProduct[]) {
   const mainElem: HTMLElement | null = document.querySelector('.main');
   if (mainElem !== null) {
     mainElem.innerHTML = '';
-    mainElem.append(new CartPage(products, getCart()).element);
+    mainElem.append(new CartPage(products, getCart(), modal).element);
   }
 }
 
@@ -81,7 +85,7 @@ export function checkProductInCart(productId: number): boolean {
 }
 
 export function changeCartBtn(btnCart: HTMLElement) {
-  btnCart.innerHTML = 'ДОБАВЛЕН';
+  btnCart.innerHTML = 'In cart';
   btnCart.classList.add('btn--disabled');
 }
 

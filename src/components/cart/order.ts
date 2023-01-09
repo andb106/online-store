@@ -39,7 +39,7 @@ export class OrderModal extends BaseComponent {
       </div>
         <div class="order__item">
           <label class="order__header">Expiry date:</label>
-          <input type="date" class="order__input" id="dateInput" required/>
+          <input type="text" class="order__input" id="dateInput" required/>
         </div>
         <div class="order__item">
           <label class="order__header">CVV:</label>
@@ -66,6 +66,7 @@ export class OrderModal extends BaseComponent {
       cvvInput,
       btnOrder,
       message,
+      dateInput,
     ] = this.getSpecifiedChildren([
       '#nameInput',
       '#phoneInput',
@@ -78,6 +79,7 @@ export class OrderModal extends BaseComponent {
       '#cvvInput',
       '#btnOrder',
       '.order__message',
+      '#dateInput',
     ]);
 
     nameInput.addEventListener('input', () => {
@@ -123,6 +125,29 @@ export class OrderModal extends BaseComponent {
       }
     });
 
+    dateInput.addEventListener('input', () => {
+      const numbers: string[] = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
+      dateInput.classList.remove('order__input--error');
+
+      const date: string[] = (dateInput as HTMLInputElement).value.split('');
+      const dateWithoutSymbol: string[] = date.filter((x) => x !== '/');
+      if (date.length === 2 && !date.includes('/')) (dateInput as HTMLInputElement).value += '/';
+      if (date.includes('/') && dateWithoutSymbol.length < 2)
+        (dateInput as HTMLInputElement).value = dateWithoutSymbol.join('');
+      if (
+        dateWithoutSymbol.length !== 6 ||
+        dateWithoutSymbol.some((x) => !numbers.includes(x)) ||
+        Number(dateWithoutSymbol[1]) > 12
+      ) {
+        dateInput.classList.add('order__input--error');
+      }
+      if (dateWithoutSymbol.length > 6) {
+        date.pop();
+        (dateInput as HTMLInputElement).value = date.join('');
+      }
+    });
+
     cvvInput.addEventListener('input', () => {
       const numbers: string[] = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
@@ -132,6 +157,10 @@ export class OrderModal extends BaseComponent {
       if (cvv.length !== 3 || cvv.some((x) => !numbers.includes(x))) {
         cvvInput.classList.add('order__input--error');
       }
+      if (cvv.length > 3) {
+        cvv.pop();
+        (cvvInput as HTMLInputElement).value = cvv.join('');
+      }
     });
 
     btnOrder.addEventListener('click', () => {
@@ -140,7 +169,7 @@ export class OrderModal extends BaseComponent {
         message.classList.add('order__message--visible');
         setTimeout(() => {
           localStorage.clear();
-          //переход на главную страницу
+          window.location.pathname = '/';
         }, 3000);
       }
     });

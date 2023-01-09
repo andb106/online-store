@@ -85,7 +85,7 @@ export function checkProductInCart(productId: number): boolean {
 }
 
 export function changeCartBtn(btnCart: HTMLElement) {
-  btnCart.innerHTML = 'ДОБАВЛЕН';
+  btnCart.innerHTML = 'In cart';
   btnCart.classList.add('btn--disabled');
 }
 

@@ -1,24 +1,28 @@
-import { CartPage } from './components/cart/cart-page';
-//import { Product } from './components/product/product';
-import { ProductPage } from './components/product-page/product-page';
 import './styles-global.scss';
-// import { IProduct } from './types';
+import { CartPage } from './components/cart/cart-page';
+import { ProductPage } from './components/product-page/product-page';
 import Router from './utils/router';
 import { ProductList } from './components/productList/productList';
 import dataJson from './data/data.json';
 import { Filters } from './components/filters/filters';
-// import { Observer } from './utils/observer';
-import { IFilters, IProduct, IState } from './types';
+import { IProduct, IState, SearchKeys } from './types';
 import { BaseComponent } from './components/baseComponent';
 import { Sort } from './components/sort/sort';
 import { Search } from './components/search/search';
 import { Found } from './components/found/found';
 import { ResetBtn } from './components/resetBtn/resetBtn';
-import { getCart } from './utils/db';
 import { ViewButtons } from './components/viewButtons/viewButtons';
 import { CopyBtn } from './components/copyBtn/copyBtn';
-import { SearchKeys } from './types';
 import { Header } from './components/header/header';
+import { getCart } from './utils/db';
+import {
+  filterData,
+  minMaxValuesFromData,
+  countItemsForSpan,
+  sortProduct,
+  searchProducts,
+  changeUrl,
+} from './utils/functionsFromIndex';
 
 const state: IState = {
   filters: {
@@ -34,21 +38,17 @@ const state: IState = {
 };
 
 const data = dataJson;
-const categoryList = new Set(data.products.map((product) => product.category));
-const brandList = new Set(data.products.map((product) => product.brand));
+const newData = data.products.filter((product) => product.images.length > 3);
+const categoryList = new Set(newData.map((product) => product.category));
+const brandList = new Set(newData.map((product) => product.brand));
 
-const minMaxPriceInitial = minMaxValuesFromData(data.products, SearchKeys.price);
-const minMaxStockInitial = minMaxValuesFromData(data.products, SearchKeys.stock);
+const minMaxPriceInitial = minMaxValuesFromData(newData, SearchKeys.price);
+const minMaxStockInitial = minMaxValuesFromData(newData, SearchKeys.stock);
 
-const countItemsCategoryInitial = countItemsForSpan(
-  data.products,
-  data.products,
-  [...categoryList],
-  SearchKeys.category
-);
-const countItemsBrandInitial = countItemsForSpan(data.products, data.products, [...brandList], SearchKeys.brand);
+const countItemsCategoryInitial = countItemsForSpan(newData, newData, [...categoryList], SearchKeys.category);
+const countItemsBrandInitial = countItemsForSpan(newData, newData, [...brandList], SearchKeys.brand);
 
-state.products = data.products;
+state.products = newData;
 state.filters.price = minMaxPriceInitial;
 state.filters.stock = minMaxStockInitial;
 
@@ -64,35 +64,9 @@ window.addEventListener('storage', () => {
   header.updateContent();
 });
 
-const filterData = (data: IProduct[], state: IState) => {
-  let res = data;
-
-  if (state.filters.category.length) {
-    res = res.filter((product) => {
-      return state.filters.category.indexOf(product.category) > -1;
-    });
-  }
-
-  if (state.filters.brand.length) {
-    res = res.filter((product) => {
-      return state.filters.brand.indexOf(product.brand) > -1;
-    });
-  }
-
-  res = res.filter((product) => {
-    return product.price >= state.filters.price[0] && product.price <= state.filters.price[1];
-  });
-
-  res = res.filter((product) => {
-    return product.stock >= state.filters.stock[0] && product.stock <= state.filters.stock[1];
-  });
-
-  return res;
-};
-
-const productList = new ProductList(data.products, (id) => {
+const productList = new ProductList(newData, (id) => {
   mainElem.innerHTML = '';
-  mainElem.append(new ProductPage(data.products[id - 1], data.products).element);
+  mainElem.append(new ProductPage(newData[id - 1], newData).element);
   history.pushState(null, '', `/product/${id}`);
 });
 
@@ -105,13 +79,13 @@ const filters = new Filters(
   minMaxStockInitial,
   (values) => {
     state.filters.price = [+values[0], +values[1]];
-    searchFilterSortUpdateProducts(data.products, state, true, false);
+    searchFilterSortUpdateProducts(newData, state, true, false);
     setViewMode(state.viewMode);
     changeUrl(SearchKeys.price, state);
   },
   (values) => {
     state.filters.stock = [+values[0], +values[1]];
-    searchFilterSortUpdateProducts(data.products, state, false, true);
+    searchFilterSortUpdateProducts(newData, state, false, true);
     setViewMode(state.viewMode);
     changeUrl(SearchKeys.stock, state);
   }
@@ -129,7 +103,7 @@ filters.element.addEventListener('click', (e) => {
 
       changeUrl(filterType, state);
     }
-    searchFilterSortUpdateProducts(data.products, state, false, false);
+    searchFilterSortUpdateProducts(newData, state, false, false);
     setViewMode(state.viewMode);
   }
 });
@@ -143,6 +117,7 @@ sort.selectElem.addEventListener('change', (e) => {
     state.sortParam = +e.target.value;
     const sortedProducts = sortProduct(state.products, +e.target.value);
     productList.updateItems(sortedProducts);
+    setViewMode(state.viewMode);
     changeUrl(SearchKeys.sortParam, state);
   }
 });
@@ -150,7 +125,7 @@ sort.selectElem.addEventListener('change', (e) => {
 const searchElem = new Search((value) => {
   const searchValue = value;
   state.searchValue = searchValue;
-  searchFilterSortUpdateProducts(data.products, state, false, false);
+  searchFilterSortUpdateProducts(newData, state, false, false);
   setViewMode(state.viewMode);
   changeUrl(SearchKeys.searchValue, state);
 });
@@ -158,6 +133,7 @@ const searchElem = new Search((value) => {
 const found = new Found();
 const resetBtn = new ResetBtn(() => {
   resetFilters();
+  setViewMode(state.viewMode);
 });
 
 const viewBtns = new ViewButtons((value) => {
@@ -173,7 +149,12 @@ new Router([
     path: 'page 404',
     view: () => {
       mainElem.innerHTML = '';
-      mainElem.innerHTML = '404 page';
+      mainElem.innerHTML = `
+      <div class="page-404">
+        <h2 class="page-404__error">404</h2>
+        <span class="page-404__text">Page not found</span>
+      </div>
+      `;
     },
   },
   {
@@ -213,7 +194,7 @@ new Router([
               break;
           }
         }
-        searchFilterSortUpdateProducts(data.products, state, false, false);
+        searchFilterSortUpdateProducts(newData, state, false, false);
         setViewMode(state.viewMode);
         filters.checkBoxFilters.forEach((item) =>
           item.updateChecked([...state.filters.brand, ...state.filters.category])
@@ -231,43 +212,22 @@ new Router([
     path: '/cart',
     view: () => {
       mainElem.replaceChildren();
-      mainElem.append(new CartPage(data.products, getCart(), false).element);
+      mainElem.append(new CartPage(newData, getCart(), false).element);
     },
   },
   {
     path: '/product/:id', // id - product id, but in data-array get position (id - 1) !
     view: (params) => {
-      const len = data.products.length;
+      const len = newData.length;
       mainElem.innerHTML = '';
       if (+params.id - 1 >= 0 && +params.id - 1 < len) {
-        mainElem.append(new ProductPage(data.products[+params.id - 1], data.products).element);
+        mainElem.append(new ProductPage(newData[+params.id - 1], newData).element);
       } else {
         mainElem.innerHTML = `Product with id ${params.id} not found`;
       }
     },
   },
 ]);
-
-function minMaxValuesFromData(data: IProduct[], prop: SearchKeys.price | SearchKeys.stock) {
-  const arr = data.map((item) => item[prop]);
-  const res = [Math.min(...arr), Math.max(...arr)];
-  return res;
-}
-
-function countItemsForSpan(
-  currentData: IProduct[],
-  allData: IProduct[],
-  filterDataList: string[],
-  productProp: SearchKeys.category | SearchKeys.brand
-) {
-  const res: number[][] = [];
-  filterDataList.forEach((prop) => {
-    const countItemsCurrent = currentData.filter((product) => product[productProp] === prop).length;
-    const countItemsAll = allData.filter((product) => product[productProp] === prop).length;
-    res.push([countItemsCurrent, countItemsAll]);
-  });
-  return res;
-}
 
 function updateFiltersValues(
   currentProducts: IProduct[],
@@ -298,33 +258,6 @@ function updateFiltersValues(
   }
 }
 
-function sortProduct(products: IProduct[], sortParam: number) {
-  switch (sortParam) {
-    case 1:
-      return products.sort((a, b) => a.price - b.price);
-    case 2:
-      return products.sort((a, b) => b.price - a.price);
-    case 3:
-      return products.sort((a, b) => a.rating - b.rating);
-    case 4:
-      return products.sort((a, b) => b.rating - a.rating);
-    default:
-      return products;
-  }
-}
-
-function searchProducts(data: IProduct[], searchValue: string) {
-  const res = data.filter((product) => {
-    const strFromProps = Object.values(product).slice(1, -2).join(' ').toLowerCase();
-    if (strFromProps.includes(searchValue)) {
-      return true;
-    } else {
-      return false;
-    }
-  });
-  return res;
-}
-
 function searchFilterSortUpdateProducts(
   allProducts: IProduct[],
   state: IState,
@@ -341,43 +274,19 @@ function searchFilterSortUpdateProducts(
 }
 
 function resetFilters() {
-  state.products = data.products;
+  state.products = newData;
   state.searchValue = '';
   state.filters.price = minMaxPriceInitial;
   state.filters.stock = minMaxStockInitial;
   state.filters.brand = [];
   state.filters.category = [];
   state.sortParam = 0;
-  searchFilterSortUpdateProducts(data.products, state, false, false);
+  searchFilterSortUpdateProducts(newData, state, false, false);
   sort.selectElem.selectedIndex = 0;
   searchElem.resetInput();
   filters.checkBoxFilters.forEach((filter) => {
     filter.resetChecked();
   });
-}
-
-function changeUrl(filterName: string, state: IState) {
-  const urlParams = new URLSearchParams(location.search);
-
-  if (isObjKey<IFilters>(filterName, state.filters)) {
-    state.filters[filterName].length
-      ? urlParams.set(filterName, state.filters[filterName].join(','))
-      : urlParams.delete(filterName);
-  }
-
-  if (isObjKey<IState>(filterName, state)) {
-    state[filterName] ? urlParams.set(filterName, `${state[filterName]}`) : urlParams.delete(filterName);
-  }
-
-  history.pushState(
-    null,
-    '',
-    urlParams.toString().length ? location.pathname + `?${urlParams.toString()}` : location.pathname
-  );
-}
-
-function isObjKey<T extends object>(key: PropertyKey, obj: T): key is keyof T {
-  return key in obj;
 }
 
 function setViewMode(viewMode: string) {

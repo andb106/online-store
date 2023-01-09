@@ -8,7 +8,7 @@ export class ProductPage extends BaseComponent {
     super('div', 'item');
     this.element.innerHTML = `
         <p class="item__breadcrumbs">
-          Главная / ${data.category} / ${data.brand} / ${data.title}
+          Store / ${data.category} / ${data.brand} / ${data.title}
         </p>
         <div class="item__main">
           <div class="item__photos">
@@ -66,6 +66,7 @@ export class ProductPage extends BaseComponent {
     btnOrder?.addEventListener('click', () => {
       if (!checkProductInCart(data.id)) addToCart(data.id, 1, data.price);
       openCart(true, products);
+      history.pushState(null, '', '/cart');
     });
   }
 

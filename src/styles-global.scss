@@ -53,7 +53,7 @@ footer .copyright:before {
 }
 
 .ico-github:hover {
-  transform: scale(1.1);
+  filter: invert(65%);
   transition: 0.3s;
 }
 
@@ -68,7 +68,7 @@ footer .copyright:before {
 }
 
 .ico-rsscool:hover {
-  transform: scale(1.1);
+  filter: invert(65%);
   transition: 0.3s;
 }
 
@@ -77,8 +77,6 @@ footer .copyright:before {
   flex-direction: column;
   flex: 1;
   flex-wrap: wrap;
-  // justify-content: center;
-  // align-items: center;
 }
 
 .filters-products {
@@ -98,6 +96,7 @@ footer .copyright:before {
   display: block;
   width: 150px;
   border-radius: 10px;
+  cursor: pointer;
 
   padding: 8px 15px;
 
@@ -123,4 +122,20 @@ footer .copyright:before {
   margin-bottom: 10px;
   padding: 10px;
   align-items: center;
+}
+
+.page-404 {
+  margin: 0 auto;
+  max-width: 200px;
+  display: inline;
+  text-align: center;
+  transition: all 1s;
+
+  &:hover {
+    transform: scale(1.5);
+  }
+}
+
+.page-404__error {
+  font-size: 5rem;
 }

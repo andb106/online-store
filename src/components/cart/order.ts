@@ -111,6 +111,7 @@ export class OrderModal extends BaseComponent {
       const card: string[] = (cardInput as HTMLInputElement).value.split('').filter((x) => x !== ' ');
 
       this.validateNumber(cardInput, card, 16);
+      this.cutNumber(cardInput, card, 16);
 
       switch (card[0]) {
         case '3':
@@ -157,10 +158,7 @@ export class OrderModal extends BaseComponent {
       if (cvv.length !== 3 || cvv.some((x) => !numbers.includes(x))) {
         cvvInput.classList.add('order__input--error');
       }
-      if (cvv.length > 3) {
-        cvv.pop();
-        (cvvInput as HTMLInputElement).value = cvv.join('');
-      }
+      this.cutNumber(cvvInput, cvv, 3);
     });
 
     btnOrder.addEventListener('click', () => {
@@ -189,6 +187,13 @@ export class OrderModal extends BaseComponent {
 
     if (value.length < minLength || value.some((x) => x.length < minLengthSymbol) || value.some((x) => x === '')) {
       input.classList.add('order__input--error');
+    }
+  }
+
+  cutNumber(input: HTMLElement, data: string[], length: number) {
+    if (data.length > length) {
+      data.pop();
+      (input as HTMLInputElement).value = data.join('');
     }
   }
 }

@@ -1,14 +1,22 @@
-import { IProduct } from './../types/index';
 import {
   filterData,
   minMaxValuesFromData,
   countItemsForSpan,
   searchProducts,
   sortProduct,
+  changeUrl,
 } from '../utils/functionsFromIndex';
 import * as dataJson from '../data/data.json';
 import { IState, SearchKeys } from '../types';
-import { addMoreToCart, addToCart, CartData, checkProductInCart, getCart, getCartNumberData, removeFromCart } from '../utils/db';
+import {
+  addMoreToCart,
+  addToCart,
+  CartData,
+  checkProductInCart,
+  getCart,
+  getCartNumberData,
+  removeFromCart,
+} from '../utils/db';
 
 const initialState: IState = {
   filters: {
@@ -176,6 +184,44 @@ describe('sortProduct function', () => {
   });
 });
 
+describe('changeUrl function', () => {
+  beforeEach(() => {
+    history.pushState(null, '', '/');
+  });
+
+  test('should add search params', () => {
+    const state = {
+      ...initialState,
+      filters: {
+        ...initialState.filters,
+        category: ['smartphones'],
+        brand: ['Apple', 'OPPO'],
+      },
+    };
+
+    changeUrl('category', state);
+    changeUrl('brand', state);
+
+    expect(location.search).toBe('?category=smartphones&brand=Apple%2COPPO');
+  });
+
+  test('should not add search params', () => {
+    const state = {
+      ...initialState,
+      filters: {
+        ...initialState.filters,
+        category: ['smartphones'],
+        brand: ['Apple', 'OPPO'],
+      },
+    };
+
+    changeUrl('cat', state);
+    changeUrl('br', state);
+
+    expect(location.search).toBe('');
+  });
+});
+
 describe('add more product to cart function', () => {
   test('should work correctly with enough product in stock', () => {
     const product = dataJson.products[0];
@@ -187,7 +233,7 @@ describe('add more product to cart function', () => {
     const result = addMoreToCart(product, product.stock * 2);
     expect(result).toEqual(false);
   });
-})
+});
 
 describe('check product in cart function', () => {
   test('should work correctly with existed product in cart', () => {
@@ -199,37 +245,37 @@ describe('check product in cart function', () => {
   test('should work correctly without existed product in cart', () => {
     const product = {
       id: dataJson.products.length + 5,
-      title: "Test product",
-      description: "Test product description",
+      title: 'Test product',
+      description: 'Test product description',
       price: 100,
       discountPercentage: 15,
       rating: 5,
       stock: 80,
-      brand: "Test brand",
-      category: "Test category",
-      thumbnail: "Test thumbnail",
-      images: ["Test img"]
-    }
+      brand: 'Test brand',
+      category: 'Test category',
+      thumbnail: 'Test thumbnail',
+      images: ['Test img'],
+    };
     const result = checkProductInCart(product.id);
     expect(result).toEqual(false);
   });
-})
+});
 
 describe('remove product from cart function', () => {
   test('should work correctly with pieces of product in cart', () => {
     const product = {
       id: dataJson.products.length + 5,
-      title: "Test product",
-      description: "Test product description",
+      title: 'Test product',
+      description: 'Test product description',
       price: 100,
       discountPercentage: 15,
       rating: 5,
       stock: 80,
-      brand: "Test brand",
-      category: "Test category",
-      thumbnail: "Test thumbnail",
-      images: ["Test img"]
-    }
+      brand: 'Test brand',
+      category: 'Test category',
+      thumbnail: 'Test thumbnail',
+      images: ['Test img'],
+    };
     addToCart(product.id, 5, product.price);
     const result = removeFromCart(product, 3, dataJson.products);
     expect(result).toEqual(true);
@@ -237,22 +283,22 @@ describe('remove product from cart function', () => {
   test('should work correctly with product in cart', () => {
     const product = {
       id: dataJson.products.length + 7,
-      title: "Test product",
-      description: "Test product description",
+      title: 'Test product',
+      description: 'Test product description',
       price: 100,
       discountPercentage: 15,
       rating: 5,
       stock: 80,
-      brand: "Test brand",
-      category: "Test category",
-      thumbnail: "Test thumbnail",
-      images: ["Test img"]
-    }
+      brand: 'Test brand',
+      category: 'Test category',
+      thumbnail: 'Test thumbnail',
+      images: ['Test img'],
+    };
     addToCart(product.id, 1, product.price);
     const result = removeFromCart(product, 1, dataJson.products);
     expect(result).toEqual(false);
   });
-})
+});
 
 describe('get cart items function', () => {
   test('should work correctly with empty cart', () => {
@@ -264,109 +310,112 @@ describe('get cart items function', () => {
     localStorage.clear();
     const product = {
       id: dataJson.products.length + 5,
-      title: "Test product",
-      description: "Test product description",
+      title: 'Test product',
+      description: 'Test product description',
       price: 100,
       discountPercentage: 15,
       rating: 5,
       stock: 80,
-      brand: "Test brand",
-      category: "Test category",
-      thumbnail: "Test thumbnail",
-      images: ["Test img"]
-    }
+      brand: 'Test brand',
+      category: 'Test category',
+      thumbnail: 'Test thumbnail',
+      images: ['Test img'],
+    };
     const product2 = {
       id: dataJson.products.length + 6,
-      title: "Test product",
-      description: "Test product description",
+      title: 'Test product',
+      description: 'Test product description',
       price: 100,
       discountPercentage: 15,
       rating: 5,
       stock: 80,
-      brand: "Test brand",
-      category: "Test category",
-      thumbnail: "Test thumbnail",
-      images: ["Test img"]
-    }
-    const expected = [{
-      productId: dataJson.products.length + 5,
-      number: 1
-    },{
-      productId: dataJson.products.length + 6,
-      number: 1
-    },];
+      brand: 'Test brand',
+      category: 'Test category',
+      thumbnail: 'Test thumbnail',
+      images: ['Test img'],
+    };
+    const expected = [
+      {
+        productId: dataJson.products.length + 5,
+        number: 1,
+      },
+      {
+        productId: dataJson.products.length + 6,
+        number: 1,
+      },
+    ];
     addToCart(product.id, 1, product.price);
     addToCart(product2.id, 1, product2.price);
     const result = getCart();
     expect(result).toEqual(expected);
   });
-})
+});
 
 describe('get number data from cart item function', () => {
   test('should work correctly for total price', () => {
     localStorage.clear();
     const product = {
       id: dataJson.products.length + 5,
-      title: "Test product",
-      description: "Test product description",
+      title: 'Test product',
+      description: 'Test product description',
       price: 100,
       discountPercentage: 15,
       rating: 5,
       stock: 80,
-      brand: "Test brand",
-      category: "Test category",
-      thumbnail: "Test thumbnail",
-      images: ["Test img"]
-    }
+      brand: 'Test brand',
+      category: 'Test category',
+      thumbnail: 'Test thumbnail',
+      images: ['Test img'],
+    };
     const product2 = {
       id: dataJson.products.length + 6,
-      title: "Test product",
-      description: "Test product description",
+      title: 'Test product',
+      description: 'Test product description',
       price: 150,
       discountPercentage: 15,
       rating: 5,
       stock: 80,
-      brand: "Test brand",
-      category: "Test category",
-      thumbnail: "Test thumbnail",
-      images: ["Test img"]
-    }
+      brand: 'Test brand',
+      category: 'Test category',
+      thumbnail: 'Test thumbnail',
+      images: ['Test img'],
+    };
     addToCart(product.id, 1, product.price);
     addToCart(product2.id, 1, product2.price);
-    const result = getCartNumberData(CartData.totalPrice)
+    const result = getCartNumberData(CartData.totalPrice);
     expect(result).toEqual(250);
   });
   test('should work correctly for total count', () => {
     localStorage.clear();
     const product = {
       id: dataJson.products.length + 5,
-      title: "Test product",
-      description: "Test product description",
+      title: 'Test product',
+      description: 'Test product description',
       price: 100,
       discountPercentage: 15,
       rating: 5,
       stock: 80,
-      brand: "Test brand",
-      category: "Test category",
-      thumbnail: "Test thumbnail",
-      images: ["Test img"]
-    }
+      brand: 'Test brand',
+      category: 'Test category',
+      thumbnail: 'Test thumbnail',
+      images: ['Test img'],
+    };
     const product2 = {
       id: dataJson.products.length + 6,
-      title: "Test product",
-      description: "Test product description",
+      title: 'Test product',
+      description: 'Test product description',
       price: 150,
       discountPercentage: 15,
       rating: 5,
       stock: 80,
-      brand: "Test brand",
-      category: "Test category",
-      thumbnail: "Test thumbnail",
-      images: ["Test img"]
-    }
+      brand: 'Test brand',
+      category: 'Test category',
+      thumbnail: 'Test thumbnail',
+      images: ['Test img'],
+    };
     addToCart(product.id, 1, product.price);
     addToCart(product2.id, 7, product2.price);
-    const result = getCartNumberData(CartData.totalCount)
+    const result = getCartNumberData(CartData.totalCount);
     expect(result).toEqual(8);
   });
 });

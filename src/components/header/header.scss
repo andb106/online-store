@@ -1,0 +1,49 @@
+.header {
+  padding: 10px 30px;
+  border-bottom: 1px solid white;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header__title {
+  font-size: 30px;
+  font-weight: 800;
+  margin: 0;
+  cursor: pointer;
+}
+
+.header__cart {
+  cursor: pointer;
+  background-image: url("../../img/cart.svg");
+  background-repeat: no-repeat;
+  width: 40px;
+  height: 40px;
+  filter: invert(100%);
+  position: relative;
+  padding-right: 10px;
+  padding-top: 10px;
+  background-position: bottom left;
+}
+
+.header__cart-counter {
+  pointer-events: none;
+  filter: inherit;
+  position: absolute;
+  top: -5px;
+  left: 30px;
+  border: 1px solid white;
+  border-radius: 7px;
+  padding: 2px;
+  color: greenyellow;
+  font-weight: bold;
+  min-width: 20px;
+  text-align: center;
+  font-size: 0.8rem;
+}
+
+.header__total-price {
+  min-width: 200px;
+  font-size: 1.1rem;
+}

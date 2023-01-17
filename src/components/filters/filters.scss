@@ -1,0 +1,20 @@
+.filter-list {
+  height: 200px;
+  overflow: hidden;
+  overflow-y: auto;
+}
+
+.price .filter-title,
+.stock .filter-title {
+  padding-bottom: 20px;
+}
+
+.checkboxItem {
+  display: flex;
+  padding-right: 10px;
+  margin-bottom: 10px;
+}
+
+.checkboxItem span {
+  margin-left: auto;
+}

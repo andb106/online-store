@@ -1,0 +1,141 @@
+body {
+  color: #fff;
+  background: #17181c;
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+
+footer {
+  border-top: 1px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+footer .copyright {
+  font-size: 14px;
+  color: #333;
+  text-align: center;
+}
+footer .copyright a {
+  color: #444;
+}
+footer .copyright a:hover {
+  color: #555;
+}
+footer .copyright:before {
+  content: '©';
+}
+
+.footer__school-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding: 0 50px;
+}
+
+.ico-github {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  background-image: url("./img/github.svg");
+  background-size: contain;
+}
+
+.ico-github:hover {
+  filter: invert(65%);
+  transition: 0.3s;
+}
+
+.ico-rsscool {
+  display: inline-block;
+  width: 60px;
+  height: 30px;
+  background-image: url("./img/rs_school_js.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.ico-rsscool:hover {
+  filter: invert(65%);
+  transition: 0.3s;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.filters-products {
+  display: flex;
+  flex: 1;
+  gap: 50px;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  @media (max-width: 1050px) {
+    gap: unset;
+  }
+}
+
+
+.btn {
+  display: block;
+  width: 150px;
+  border-radius: 10px;
+  cursor: pointer;
+
+  padding: 8px 15px;
+
+  transition: all .2s linear;
+
+  &:hover {
+    opacity: .5;
+  }
+
+  &--disabled {
+    pointer-events: none;
+    opacity: .2;
+  }
+}
+
+.bar {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  border: 1px solid white;
+  border-radius: 10px;
+  text-align: center;
+  margin-bottom: 10px;
+  padding: 10px;
+  align-items: center;
+}
+
+.page-404 {
+  margin: 0 auto;
+  max-width: 200px;
+  display: inline;
+  text-align: center;
+  transition: all 1s;
+
+  &:hover {
+    transform: scale(1.5);
+  }
+}
+
+.page-404__error {
+  font-size: 5rem;
+}

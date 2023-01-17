@@ -1,0 +1,273 @@
+.position {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+
+    &__title {
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    &__info {
+        margin: 0 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    &__calc {
+        display: flex;
+        flex-direction: column;
+        margin: 0 40px;
+    }
+
+    &__number {
+        display: block;
+        margin: 0 auto;
+    }
+
+    &__img {
+        display: block;
+        width: 80px;
+        height: 80px;
+
+        margin-left: 30px;
+    }
+}
+
+.cart {
+    padding: 40px 0;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+    &__title {
+        margin-bottom: 50px;
+        text-align: start;
+    }
+
+    &__block {
+        margin-bottom: 30px;
+    }
+
+    &__pagination {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        margin-bottom: 30px;
+    }
+
+    &__select {
+        margin-top: 10px;
+    }
+
+    &__pages {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &__page {
+        &:not(:first-child) {
+            margin-left: 8px;
+        }
+
+        display: block;
+        height: 35px;
+        width: auto;
+        text-align: center;
+
+        &--chosen {
+            background: none;
+            color: aliceblue;
+            border: thin solid aliceblue;
+        }
+    }
+
+    &__total {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        & span {
+            margin: 0 6px;
+        }
+    }
+
+    &__promo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 20px;
+
+        & p {
+            margin-right: 30px;
+        }
+    }
+
+    &__btn-promo {
+        margin-left: 30px;
+    }
+
+    &__applied {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    &__error {
+        display: none;
+        margin: 0 auto;
+        color: red;
+
+        &--visible {
+            display: block;
+        }
+    }
+
+    &__title-promo {
+        margin: 0 auto;
+        display: none;
+
+        &--visible {
+            display: block;
+        }
+    }
+
+    &__sum {
+        text-decoration: none;
+
+        &--overlined {
+            text-decoration: line-through;
+        }
+    }
+
+    &__new-sum {
+        display: none;
+
+        &--visible {
+            display: block;
+        }
+    }
+}
+
+.promocode {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    & span {
+        margin-right: 30px;
+    }
+}
+
+.order {
+    display: block;
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1000px;
+    background: rgba($color: #000000, $alpha: .7);
+
+    &__main {
+        z-index: 3;
+        top: 0;
+        left: 0;
+        margin: 0 auto;
+        width: 38%;
+        opacity: 0.8;
+        border: 1px solid red;
+        padding: 15px;
+        border-radius: 20px;
+        background: #17181c;
+        text-align: center
+    }
+
+    &__info {
+        display: grid;
+        grid-template-rows: 2fr 2fr 2fr;
+        grid-template-columns: 2fr 2fr;
+    }
+
+    &__cards {
+        display: flex;
+        align-items: center;
+        justify-content: left;
+        margin: 30px 0;
+    }
+
+    &__payment {
+        display: grid;
+        grid-template-rows: 2fr 2fr;
+        grid-template-columns: 2fr 2fr;
+    }
+
+    &__img {
+        background-repeat: no-repeat;
+        background-size: 70px;
+        background-position: center;
+        display: block;
+        width: 80px;
+        height: 40px;
+        border: none;
+
+        &:not(:first-child) {
+            margin-left: 20px;
+        }
+
+        &--chosen {
+            border: 2px solid aliceblue;
+        }
+    }
+
+    &__american-express {
+        background-image: url("../../img/american-express.png");
+    }
+
+    &__unionpay {
+        background-image: url("../../img/unionpay.png");
+    }
+
+    &__visa {
+        background-image: url("../../img/visa.png");
+    }
+
+    &__input {
+        &:focus {
+            outline: none;
+        }
+
+        &--error {
+            border: 2px solid red;
+        }
+    }
+
+    &__btn {
+        margin: 0 auto;
+    }
+
+    &__message {
+        display: none;
+        margin: 0 auto;
+        position: absolute;
+        width: 500px;
+        height: auto;
+        padding: 40px;
+        z-index: 10;
+        top: 50%;
+        left: 20%;
+        color: #000000;
+
+        background: aliceblue;
+        border-radius: 20px;
+
+        &--visible {
+            display: block;
+        }
+    }
+}

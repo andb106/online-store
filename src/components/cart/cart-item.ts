@@ -1,6 +1,5 @@
 import { IProduct } from './../../types/index';
 import { BaseComponent } from './../baseComponent';
-import '../cart/cart.scss';
 import { addMoreToCart, removeFromCart } from '../../utils/db';
 
 export class CartItem extends BaseComponent {

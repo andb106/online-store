@@ -1,6 +1,5 @@
 import { IPromocode } from './../../types/index';
 import { BaseComponent } from './../baseComponent';
-import '../cart/cart.scss';
 
 export class Promocode extends BaseComponent {
   promocode: IPromocode;

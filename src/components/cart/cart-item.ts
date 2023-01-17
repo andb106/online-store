@@ -1,7 +1,7 @@
 import { IProduct } from './../../types/index';
 import { BaseComponent } from './../baseComponent';
-import '../cart/cart.scss';
 import { addMoreToCart, removeFromCart } from '../../utils/db';
+import './cart.scss';
 
 export class CartItem extends BaseComponent {
   constructor(data: IProduct, idx: number, count: number, all: IProduct[], updateNumsInCart: () => void) {
